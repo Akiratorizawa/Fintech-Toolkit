@@ -1,0 +1,9 @@
+[1] Credit Card Validator - Theo
+
+[2] Currency Denomination Calculator - Dom
+
+[3] Monthly Installment Calculator - Dom
+
+[4] Loan Interest Calculator - Dom
+
+[5] Percentage and Tax Calculator - Theo
