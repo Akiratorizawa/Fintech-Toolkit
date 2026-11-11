@@ -12,7 +12,14 @@ public class creditCardValidator {
         //all Visa numbers start with 4
 
         //ALL OK
-        if (number.length()>=13 && number.length()<=16) {
+        if (number.length()>=13 && number.length()<=19 && number.length() != 14) {
+            int firstFourNumbers = Integer.parseInt(number.substring(0, 4));
+
+            if (firstFourNumbers>=3528 && firstFourNumbers<=3589) {
+                System.out.println("JCB");
+                return;
+            }
+
             if (number.startsWith("34") || number.startsWith("37")) {
                 System.out.println("AMEX");
             }else if (number.startsWith("51") || number.startsWith("52") || number.startsWith("53") || number.startsWith("54") || number.startsWith("55")) {
@@ -25,25 +32,36 @@ public class creditCardValidator {
         }
     }
 
-    public static void LuhnAlgorithm(String number){
+    public static boolean LuhnAlgorithm(String number){
         char[] CardNumberArray = number.toCharArray();
-        int max = number.length();
+        int max = (CardNumberArray.length);
         int toBeAdded = 0;
         int toBeMultiplied = 0;
-        for(int i = 0; i < max; i++){
+        int[] twoDigits;
+        for(int i = 1; i <= max; i++){
             //the sum of the digits that weren’t multiplied by 2
             if (i%2 != 0) {
                 //System.out.println("Adding: " + Character.getNumericValue(CardNumberArray[(number.length())-i]));
                 toBeAdded += Character.getNumericValue(CardNumberArray[(number.length())-i]);
-                //System.out.println(toBeAdded);
+                //System.out.println("Sum: " + toBeAdded);
                 //System.out.println();
             }else {
-                System.out.println("Product: " + Character.getNumericValue(CardNumberArray[(number.length())-i]));
+                //System.out.println("Product: " + Character.getNumericValue(CardNumberArray[(number.length())-i]));
+                if ((Character.getNumericValue(CardNumberArray[(number.length())-i])) * 2 >=10) {
+                    toBeMultiplied += (Character.getNumericValue(CardNumberArray[(number.length())-i])*2) % 10 + (Character.getNumericValue(CardNumberArray[(number.length())-i])*2) / 10;
+                }
+
+                else {
                 toBeMultiplied += (Character.getNumericValue(CardNumberArray[(number.length())-i])*2);
-                System.out.println(toBeMultiplied);
-                System.out.println();
+                }
+                //System.out.println("Total: " + toBeMultiplied);
+                //System.out.println();
             }
-            //System.out.println(toBeMultiplied + toBeAdded);
+        }
+        if (((toBeAdded+toBeMultiplied)%10)==0) {
+            return true;
+        } else{
+            return false;
         }
     }
 
@@ -52,8 +70,8 @@ public class creditCardValidator {
         //all input as string
         System.out.println("Card Number: ");
         String CardNumber = scan.nextLine();
-        //isCreditNumReal(CardNumber);
-        LuhnAlgorithm(CardNumber);
+        isCreditNumReal(CardNumber);
+        System.out.println(LuhnAlgorithm(CardNumber));
         
 
     }
