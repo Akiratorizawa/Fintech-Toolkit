@@ -1,3 +1,5 @@
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.Scanner;
 
 public class Main {
@@ -59,7 +61,8 @@ public class Main {
         }
 
         else if (option == 3) {
-            // TODO, monthlyInstallment()
+            transitionDelay();
+            monthlyInstallment();
         }
 
         else if (option == 4) {
@@ -72,110 +75,280 @@ public class Main {
     }
 
     public static void currencyDenomination() {
-        System.out.println("""
-            \n========================================
-                CURRENCY DENOMINATION CALCULATOR
-            ========================================
-            """);
-        
-        System.out.println("This tool calculates the total amount of cash bills and coins needed to amount to a certain amount of pesos.");
-        
-        boolean searching = true;
-        Long amount = 0L;
-
-        while (searching) {
-            System.out.print("Enter the amount of money you would like to convert into bills and coins (Whole number): ");
+        while (true) {
+            System.out.println("""
+                \n========================================
+                    CURRENCY DENOMINATION CALCULATOR
+                ========================================
+                """);
             
-            String input = scanner.nextLine();
+            System.out.println("This tool calculates the total amount of cash bills and coins needed to amount to a certain amount of pesos.");
+            
+            boolean searching = true;
+            Long amount = 0L;
 
-            try {
-                amount = Long.parseLong(input);
-                searching = false;
-            } catch (NumberFormatException e) {
-                System.out.println("Please enter a valid amount of money.\n");
+            while (searching) {
+                System.out.print("Enter the amount of money you would like to convert into bills and coins (Whole number): ");
+                
+                String input = scanner.nextLine();
+
+                try {
+                    amount = Long.parseLong(input);
+                    searching = false;
+                } catch (NumberFormatException e) {
+                    System.out.println("Please enter a valid amount of money.\n");
+                }
+            }
+
+            Long thousands = 0L;
+            Long fiveHundreds = 0L;
+            Long hundreds = 0L;
+            Long fiftys = 0L;
+            Long tens = 0L;
+            Long fives = 0L;
+
+            System.out.println();
+
+            transitionDelay();
+
+            // Getting denomination values
+            if (amount >= 1000) {
+                thousands = amount / 1000;
+                amount = amount - (1000 * thousands);
+                System.out.println("Thousands (1000s): " + thousands);
+            }
+
+            if (amount >= 500) {
+                fiveHundreds = amount / 500;
+                amount = amount - (500 * fiveHundreds);
+                System.out.println("Five Hundreds (500s): " + fiveHundreds);
+
+            }
+
+            if (amount >= 100) {
+                hundreds = amount / 100;
+                amount = amount - (100 * hundreds);
+                System.out.println("Hundreds (100s): " + hundreds);
+            }
+
+            if (amount >= 50) {
+                fiftys = amount / 50;
+                amount = amount - (50 * fiftys);
+                System.out.println("Fiftys (50s): " + fiftys);
+            }
+
+            if (amount >= 10) {
+                tens = amount / 10;
+                amount = amount - (10 * tens);
+                System.out.println("Tens (10s): " + tens);
+
+            }
+
+            if (amount >= 5) {
+                fives = amount / 5;
+                amount = amount - (5 * fives);
+                System.out.println("Fives (5s): " + fives);
+            }
+
+            if (amount != 0) {
+                System.out.println("Ones (1s): " + amount);
+            }
+
+            searching = true;
+
+            transitionDelay();
+            System.out.println("\nWould you like to input another amount?");
+            while (searching) {
+                System.out.println("Please enter Y or N.");
+                System.out.print("Option: ");
+
+                String input = scanner.nextLine().toLowerCase();
+
+                if (input.equals("y")) {
+                    transitionDelay();
+                    searching = false;
+                }
+
+                else if (input.equals("n")) {
+                    transitionDelay();
+                    searching = false;
+                    mainMenu();
+                    break;
+                }
+
+                else {
+                    System.out.println();
+                }
             }
         }
+    }
 
-        Long thousands = 0L;
-        Long fiveHundreds = 0L;
-        Long hundreds = 0L;
-        Long fiftys = 0L;
-        Long tens = 0L;
-        Long fives = 0L;
+    public static void monthlyInstallment() {
+        while (true) {
+            System.out.println("""
+                \n==========================================
+                       MONTHLY INSTALLMENT CALCULATOR
+                ==========================================
+                """);
+            
+            System.out.println("This tool calculates the monthly principal and interest installment payments for amortized loans.\n");
+            System.out.println("Please enter the following:\n");
+            
+            boolean searching = true;
 
-        System.out.println();
+            BigDecimal principal = BigDecimal.valueOf(0.0);
+            BigDecimal interestRate = BigDecimal.valueOf(0.0);
+            int months = 0;
 
-        transitionDelay();
+            double principalInput = 0;
+
+            while (searching) {
+                System.out.print("Principal Amount: ");
+
+                try {
+                    principalInput = Double.parseDouble(scanner.nextLine());
+
+                    if (principalInput > 0) {
+                        principal = BigDecimal.valueOf(principalInput).setScale(2, RoundingMode.HALF_UP);
+                        searching = false;
+                        System.out.println();
+                    }
+
+                    else {
+                        System.out.println("Please enter an whole number amount greater than 0.\n");
+                    }
+                }
+
+                catch (NumberFormatException e) {
+                    System.out.println("Please enter a whole number.\n");
+                }
+            }
+
+            searching = true;
+
+            double interestRateInput = 0;
+            while (searching) {
+                System.out.print("Annual Interest Rate: ");
+                try {
+                    interestRateInput = Double.parseDouble(scanner.nextLine()) / 100;
+
+                    if (interestRateInput >= 0 && interestRateInput <= 100) {
+                        interestRate = BigDecimal.valueOf(interestRateInput)
+                                        .divide(BigDecimal.valueOf(12.0), 10, RoundingMode.HALF_UP);
+                        searching = false;
+                        System.out.println();
+                    }
+
+                    else {
+                        System.out.println("Please enter an annual interest rate from 0 to 100.\n");
+                    }
+                }
+
+                catch (NumberFormatException e) {
+                    System.out.println("Please enter an annual interest rate from 0 to 100.\n");
+                }
+            }
+
+            searching = true;
+
+            while (searching) {
+                System.out.print("Payment Period (in months): ");
+                try {
+                    months = Integer.parseInt(scanner.nextLine());
+
+                    if (months > 0) {
+                        searching = false;
+                        System.out.println();
+                    }
+
+                    else {
+                        System.out.println("Please enter a payment period of greater than 0 months.\n");
+                    }
+                }
+
+                catch (NumberFormatException e) {
+                    System.out.println("Please enter a whole number as the payment period in months.\n");
+                }
+            }
+
+            
+            BigDecimal tmpNumerator = interestRate
+                                        .multiply(interestRate.add(BigDecimal.valueOf(1.0)).pow(months));
+
+            BigDecimal tmpDenominator = (interestRate
+                                            .add(BigDecimal.valueOf(1.0)).pow(months))
+                                            .subtract(BigDecimal.valueOf(1.0));
+            
+            BigDecimal totalMonthlyPayment = principal.multiply(
+                tmpNumerator.divide(tmpDenominator, 10, RoundingMode.HALF_UP)
+            ).setScale(2, RoundingMode.HALF_UP);
+
+            BigDecimal remainingBalance = principal;
+            
+            System.out.println("                   ===========================");
+            System.out.println("                        PAYMENT BREAKDOWN");
+            System.out.println("                   ===========================");
+
+            String format = "| %-5s | %-17s | %-16s | %-17s |%n";
+            String line = "+-------+-------------------+------------------+-------------------+";
+
+            System.out.println(line);
+            System.out.printf(format, "Month", "Principal Payment", "Interest Payment", "Remaining Balance");
+            System.out.println(line);
+
+            transitionDelay();
+            
+            for (int i = 1; i <= months; i++) {
+                BigDecimal interestPayment = remainingBalance.multiply(interestRate).setScale(2, RoundingMode.HALF_UP);
+                BigDecimal principalPayment = totalMonthlyPayment.subtract(interestPayment).setScale(2, RoundingMode.HALF_UP);
+                remainingBalance = remainingBalance.subtract(principalPayment).setScale(2, RoundingMode.HALF_UP);
+
+                if (i == months) {
+                    principalPayment = principalPayment.add(remainingBalance);
+                    remainingBalance = BigDecimal.ZERO;
+                }
+
+                System.out.printf(format, i, principalPayment, interestPayment, remainingBalance);
+                System.out.println(line);
+            }
+
+            System.out.println("Monthly installment breakdown for a principal amount of P" + principalInput + ", and an annual interest rate of " + interestRateInput * 100 + "% over " + months + " months.");
+            
+            transitionDelay();
+            System.out.println();
         
-        // Getting denomination values
-        if (amount >= 1000) {
-            thousands = amount / 1000;
-            amount = amount - (1000 * thousands);
-            System.out.println("Thousands (1000s): " + thousands);
-        }
+            System.out.println("\nWould you like to input another loan amount?");
 
-        if (amount >= 500) {
-            fiveHundreds = amount / 500;
-            amount = amount - (500 * fiveHundreds);
-            System.out.println("Five Hundreds (500s): " + fiveHundreds);
+            searching = true;
+            boolean quit = false;
 
-        }
+            while (searching) {
+                System.out.println("Please enter Y or N.");
+                System.out.print("Option: ");
 
-        if (amount >= 100) {
-            hundreds = amount / 100;
-            amount = amount - (100 * hundreds);
-            System.out.println("Hundreds (100s): " + hundreds);
-        }
+                String input = scanner.nextLine().toLowerCase();
 
-        if (amount >= 50) {
-            fiftys = amount / 50;
-            amount = amount - (50 * fiftys);
-            System.out.println("Fiftys (50s): " + fiftys);
-        }
+                if (input.equals("y")) {
+                    transitionDelay();
+                    searching = false;
+                }
 
-        if (amount >= 10) {
-            tens = amount / 10;
-            amount = amount - (10 * tens);
-            System.out.println("Tens (10s): " + tens);
+                else if (input.equals("n")) {
+                    transitionDelay();
+                    searching = false;
+                    quit = true;
+                }
 
-        }
-
-        if (amount >= 5) {
-            fives = amount / 5;
-            amount = amount - (5 * fives);
-            System.out.println("Fives (5s): " + fives);
-        }
-
-        if (amount != 0) {
-            System.out.println("Ones (1s): " + amount);
-        }
-
-        searching = true;
-
-        transitionDelay();
-        System.out.println("\nWould you like to input another amount?");
-        while (searching) {
-            System.out.println("Please enter Y or N.");
-            System.out.print("Option: ");
-
-            String input = scanner.nextLine().toLowerCase();
-
-            if (input.equals("y")) {
-                transitionDelay();
-                searching = false;
-                currencyDenomination();
-                return;
+                else {
+                    System.out.println();
+                }
             }
 
-            else if (input.equals("n")) {
+            if (quit == true) {
                 transitionDelay();
-                searching = false;
+                System.out.println();
                 mainMenu();
                 return;
-            }
-
-            else {
-                System.out.println();
             }
         }
     }
