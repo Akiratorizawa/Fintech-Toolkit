@@ -1,3 +1,8 @@
 11/10/26
 - Added main menu text
 - Added main menu user input validation loop
+- Finished currency denomination calculator (option 2)
+
+11/11/26
+- Monthly installment implemented
+- Great progress with card validator, finished prototype
