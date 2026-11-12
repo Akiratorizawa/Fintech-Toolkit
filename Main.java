@@ -21,14 +21,15 @@ public class Main {
             [2] Currency Denomination Calculator
             [3] Monthly Installment Calculator
             [4] Loan Interest Calculator
-            [5] Percentage and Tax Calculator\n""");
+            [5] Percentage and Tax Calculator
+            [6] Quit\n""");
         
         boolean searching = true;
         int option = 0;
 
         // Looping for valid user input
         while (searching) {
-            System.out.println("Please enter a number from 1 to 5.");
+            System.out.println("Please enter a number from 1 to 6.");
             System.out.print("Option: ");
 
             
@@ -37,8 +38,9 @@ public class Main {
             try {
                 option = Integer.parseInt(input);
 
-                if (option >= 1 && option <= 5) {
+                if (option >= 1 && option <= 6) {
                     searching = false;
+                    System.out.println();
                 }
 
                 else {
@@ -69,8 +71,14 @@ public class Main {
             // TODO, loanInterest()
         }
 
-        else {
+        else if (option == 5) {
             // TODO, percentageAndTax()
+        }
+
+        else {
+            System.out.println("Thank you for using Fintech Toolkit.");
+            transitionDelay();
+            return;
         }
     }
 
@@ -83,6 +91,7 @@ public class Main {
                 """);
             
             System.out.println("This tool calculates the total amount of cash bills and coins needed to amount to a certain amount of pesos.");
+            System.out.println("Enter Q to go back to the main menu.\n");
             
             boolean searching = true;
             Long amount = 0L;
@@ -91,6 +100,13 @@ public class Main {
                 System.out.print("Enter the amount of money you would like to convert into bills and coins (Whole number): ");
                 
                 String input = scanner.nextLine();
+
+                if (input.toLowerCase().equals("q")) {
+                    transitionDelay();
+                    System.out.println();
+                    mainMenu();
+                    return;
+                }
 
                 try {
                     amount = Long.parseLong(input);
@@ -159,7 +175,7 @@ public class Main {
             transitionDelay();
             System.out.println("\nWould you like to input another amount?");
             while (searching) {
-                System.out.println("Please enter Y or N.");
+                System.out.println("Please enter Y to input another currency amount or N to return to the main menu.");
                 System.out.print("Option: ");
 
                 String input = scanner.nextLine().toLowerCase();
@@ -191,7 +207,9 @@ public class Main {
                 ==========================================
                 """);
             
-            System.out.println("This tool calculates the monthly principal and interest installment payments for amortized loans.\n");
+            System.out.println("This tool calculates the monthly principal and interest installment payments for amortized loans.");
+            System.out.println("Enter Q at any time to return to the main menu.\n");
+
             System.out.println("Please enter the following:\n");
             
             boolean searching = true;
@@ -201,12 +219,22 @@ public class Main {
             int months = 0;
 
             double principalInput = 0;
+            String input;
 
             while (searching) {
                 System.out.print("Principal Amount: ");
 
                 try {
-                    principalInput = Double.parseDouble(scanner.nextLine());
+                    input = scanner.nextLine();
+
+                    if (input.toLowerCase().equals("q")) {
+                        transitionDelay();
+                        System.out.println();
+                        mainMenu();
+                        return;
+                    }
+
+                    principalInput = Double.parseDouble(input);
 
                     if (principalInput > 0) {
                         principal = BigDecimal.valueOf(principalInput).setScale(2, RoundingMode.HALF_UP);
@@ -227,10 +255,20 @@ public class Main {
             searching = true;
 
             double interestRateInput = 0;
+
             while (searching) {
                 System.out.print("Annual Interest Rate: ");
                 try {
-                    interestRateInput = Double.parseDouble(scanner.nextLine()) / 100;
+                    input = scanner.nextLine();
+
+                    if (input.toLowerCase().equals("q")) {
+                        transitionDelay();
+                        System.out.println();
+                        mainMenu();
+                        return;
+                    }
+
+                    interestRateInput = Double.parseDouble(input) / 100;
 
                     if (interestRateInput >= 0 && interestRateInput <= 100) {
                         interestRate = BigDecimal.valueOf(interestRateInput)
@@ -254,7 +292,17 @@ public class Main {
             while (searching) {
                 System.out.print("Payment Period (in months): ");
                 try {
-                    months = Integer.parseInt(scanner.nextLine());
+
+                    input = scanner.nextLine();
+
+                    if (input.toLowerCase().equals("q")) {
+                        transitionDelay();
+                        System.out.println();
+                        mainMenu();
+                        return;
+                    }
+
+                    months = Integer.parseInt(input);
 
                     if (months > 0) {
                         searching = false;
@@ -289,11 +337,11 @@ public class Main {
             System.out.println("                        PAYMENT BREAKDOWN");
             System.out.println("                   ===========================");
 
-            String format = "| %-5s | %-17s | %-16s | %-17s |%n";
-            String line = "+-------+-------------------+------------------+-------------------+";
+            String format = "| %-5s | %-17s | %-16s | %-16s | %-17s |%n";
+            String line = "+-------+-------------------+------------------+------------------+-------------------+";
 
             System.out.println(line);
-            System.out.printf(format, "Month", "Principal Payment", "Interest Payment", "Remaining Balance");
+            System.out.printf(format, "Month", "Principal Payment", "Interest Payment", "Total Payment", "Remaining Balance");
             System.out.println(line);
 
             transitionDelay();
@@ -308,7 +356,9 @@ public class Main {
                     remainingBalance = BigDecimal.ZERO;
                 }
 
-                System.out.printf(format, i, principalPayment, interestPayment, remainingBalance);
+                BigDecimal totalPayment = interestPayment.add(principalPayment).setScale(2, RoundingMode.HALF_UP);
+
+                System.out.printf(format, i, principalPayment, interestPayment, totalPayment, remainingBalance);
                 System.out.println(line);
             }
 
@@ -323,10 +373,10 @@ public class Main {
             boolean quit = false;
 
             while (searching) {
-                System.out.println("Please enter Y or N.");
+                System.out.println("Please enter Y to input another loan amount or N to return to the main menu.");
                 System.out.print("Option: ");
 
-                String input = scanner.nextLine().toLowerCase();
+                input = scanner.nextLine().toLowerCase();
 
                 if (input.equals("y")) {
                     transitionDelay();
