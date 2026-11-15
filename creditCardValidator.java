@@ -1,7 +1,7 @@
 import java.util.Scanner;
 
 public class creditCardValidator {
-    public static void isCreditNumReal(String number){
+    public static String isCreditNumReal(String number){
         //length check
         //American Express uses 15-digit numbers
         //MasterCard uses 16-digit numbers
@@ -16,20 +16,20 @@ public class creditCardValidator {
             int firstFourNumbers = Integer.parseInt(number.substring(0, 4));
 
             if (firstFourNumbers>=3528 && firstFourNumbers<=3589) {
-                System.out.println("JCB");
-                return;
+                return "JCB";
             }
 
             if (number.startsWith("34") || number.startsWith("37")) {
-                System.out.println("AMEX");
+                return "AMEX";
             }else if (number.startsWith("51") || number.startsWith("52") || number.startsWith("53") || number.startsWith("54") || number.startsWith("55")) {
-                System.out.println("MasterCard");
+                return "MasterCard";
             }else if (number.startsWith("4")) {
-                System.out.println("Visa");
+                return "Visa";
             }
         } else{
-            System.out.println("Invalid Card Number");
+            return "Invalid Card Number";
         }
+        return "";
     }
 
     public static boolean LuhnAlgorithm(String number){
@@ -68,10 +68,12 @@ public class creditCardValidator {
     public static void main(String[] args){
         Scanner scan = new Scanner(System.in);
         //all input as string
-        System.out.println("Card Number: ");
+        System.out.print("Enter Card Number to verify: ");
         String CardNumber = scan.nextLine();
-        isCreditNumReal(CardNumber);
-        System.out.println(LuhnAlgorithm(CardNumber));
+        String CardType = isCreditNumReal(CardNumber);
+        System.out.println("Type of Card Detected: " + CardType);
+        String CardValidation = (LuhnAlgorithm(CardNumber)) ? "Luhn's Algorhithm Passed!" : "Luhn's Algorhithm Failed!";
+        System.out.println(CardValidation);
         
 
     }
