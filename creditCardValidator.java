@@ -1,7 +1,7 @@
 import java.util.Scanner;
 
 public class creditCardValidator {
-    public static String isCreditNumReal(String number){
+    public static String Credit_Type(String number){
         //length check
         //American Express uses 15-digit numbers
         //MasterCard uses 16-digit numbers
@@ -32,7 +32,7 @@ public class creditCardValidator {
         return "";
     }
 
-    public static boolean LuhnAlgorithm(String number){
+    public static String LuhnAlgorithm(String number){
         char[] CardNumberArray = number.toCharArray();
         int max = (CardNumberArray.length);
         int toBeAdded = 0;
@@ -59,22 +59,27 @@ public class creditCardValidator {
             }
         }
         if (((toBeAdded+toBeMultiplied)%10)==0) {
-            return true;
+            return "Card is Legitimate!";
         } else{
-            return false;
+            return "Card is Illegitimate!";
         }
     }
 
     public static void main(String[] args){
         Scanner scan = new Scanner(System.in);
         //all input as string
-        System.out.print("Enter Card Number to verify: ");
-        String CardNumber = scan.nextLine();
-        String CardType = isCreditNumReal(CardNumber);
+        String CardNumber = ""; 
+        //need alphabet checker
+        while (CardNumber.isEmpty() == true) {
+            System.out.print("Enter Card Number to verify: ");
+            CardNumber = scan.nextLine();
+            if (CardNumber.isEmpty() == true) {
+                System.out.println("Try Again: \n");
+            }
+        }
+        String CardType = Credit_Type(CardNumber);
         System.out.println("Type of Card Detected: " + CardType);
-        String CardValidation = (LuhnAlgorithm(CardNumber)) ? "Luhn's Algorhithm Passed!" : "Luhn's Algorhithm Failed!";
-        System.out.println(CardValidation);
+        System.out.println(LuhnAlgorithm(CardNumber));
         
-
     }
 }
