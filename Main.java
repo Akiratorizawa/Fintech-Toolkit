@@ -53,32 +53,35 @@ public class Main {
             }
         }
     
-        if (option == 1) {
+        switch (option) {
             // TODO, cardValidator()
-        }
+            case 1 -> System.out.println("todo, card validator");
 
-        else if (option == 2) {
-            transitionDelay();
-            currencyDenomination();
-        }
+            case 2 -> {
+                transitionDelay();
+                currencyDenomination();
+            }
 
-        else if (option == 3) {
-            transitionDelay();
-            monthlyInstallment();
-        }
+            case 3 -> {
+                transitionDelay();
+                monthlyInstallment();
+            }
 
-        else if (option == 4) {
-            // TODO, loanInterest()
-        }
+            case 4 -> {
+                // TODO, loanInterest(), will be changed with something else
+                System.out.println("todo, loan interest, will be changed");
+            }
 
-        else if (option == 5) {
-            // TODO, percentageAndTax()
-        }
+            case 5 -> {
+                // TODO, percentageAndTax()
+                System.out.println("todo, percentage and tax");
+            }
 
-        else {
-            System.out.println("Thank you for using Fintech Toolkit.");
-            transitionDelay();
-            return;
+            case 6 ->  {
+                System.out.println("Thank you for using Fintech Toolkit.");
+                transitionDelay();
+                return;
+            }
         }
     }
 
@@ -189,7 +192,7 @@ public class Main {
                     transitionDelay();
                     searching = false;
                     mainMenu();
-                    break;
+                    return;
                 }
 
                 else {
