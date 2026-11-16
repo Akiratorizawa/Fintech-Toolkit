@@ -66,13 +66,21 @@ public static void displayResult(String cardNumber, String type, String legitima
         String[] CardNumber = new String[999]; 
         String input = "";
         int i = 0;
+
+        System.out.printf("""
+        =======================================================================
+                                Credit Card Validator
+        =======================================================================
+        """);
+        System.out.println();
+        System.out.println("Enter Q to go back to the main menu.\n");
         //need alphabet checker
         while (true) {
             System.out.print("Enter Card Number to Verify: ");
             input = scan.nextLine();
             if (input.isEmpty() == true) {
-                System.out.println("Try Again or enter x to view summary: \n");
-            }else if ((input.equals("x")) == true) {
+                System.out.println("Try Again: \n");
+            }else if ((input.equals("Q")) == true || (input.equals("q")) == true) {
                 break;
             }else if ((input.matches("[0-9]+")) == false) {
                 System.out.println("Numbers only!");
@@ -82,14 +90,14 @@ public static void displayResult(String cardNumber, String type, String legitima
         }
 
 
-        System.out.println("=======================================================================");
+        System.out.println("\n\n=======================================================================");
         System.out.printf("%-25s | %-10s | %-25s%n",
                 "Card Number", "Type", "Legitimacy");
         System.out.println("-----------------------------------------------------------------------");
         
         for(int x=0; x<CardNumber.length ; x++){
             if ((CardNumber[x]) == null || ((CardNumber[x]).matches("[0-9]+")) == false) {
-                break;
+                continue;
             }
             String CardType = Credit_Type(CardNumber[x]);
             System.out.printf("%-25s | %-10s | %-25s%n",
