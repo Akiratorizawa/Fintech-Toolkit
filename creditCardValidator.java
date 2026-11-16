@@ -26,10 +26,8 @@ public class creditCardValidator {
             }else if (number.startsWith("4")) {
                 return "Visa";
             }
-        } else{
-            return "Invalid Card Number";
         }
-        return "";
+        return "Invalid Card Number";
     }
 
     public static String LuhnAlgorithm(String number){
@@ -65,21 +63,68 @@ public class creditCardValidator {
         }
     }
 
+
+public static void displayResult(String cardNumber, String type, String legitimacy) {
+
+    System.out.println("====================================================================");
+    System.out.printf("%-25s | %-18s | %-15s%n",
+            "Card Number", "Type", "Legitimacy");
+    System.out.println("--------------------------------------------------------------------");
+
+    System.out.printf("%-25s | %-18s | %-15s%n",
+            cardNumber, type, legitimacy);
+
+    System.out.println("====================================================================");
+}
+
+
     public static void main(String[] args){
         Scanner scan = new Scanner(System.in);
         //all input as string
-        String CardNumber = ""; 
-        //need alphabet checker
-        while (CardNumber.isEmpty() == true) {
-            System.out.print("Enter Card Number to verify: ");
-            CardNumber = scan.nextLine();
-            if (CardNumber.isEmpty() == true) {
-                System.out.println("Try Again: \n");
-            }
-        }
-        String CardType = Credit_Type(CardNumber);
-        System.out.println("Type of Card Detected: " + CardType);
-        System.out.println(LuhnAlgorithm(CardNumber));
+        String[] CardNumber = new String[999]; 
+        String input = "";
+        int i = 0;
         
+        //need alphabet checker
+
+        // while (CardNumber.isEmpty() == true) {
+        //     System.out.print("Enter Card Number to verify: ");
+        //     CardNumber = scan.nextLine();
+        //     if (CardNumber.isEmpty() == true) {
+        //         System.out.println("Try Again: \n");
+        //     }
+        // }
+        // String CardType = Credit_Type(CardNumber);
+        // System.out.println("Type of Card Detected: " + CardType);
+        // System.out.println(LuhnAlgorithm(CardNumber));
+        
+        while (true) {
+            System.out.print("Enter Card Number to Verify: ");
+            input = scan.nextLine();
+            if (input.isEmpty() == true) {
+                System.out.println("Try Again or enter x to view summary: \n");
+            }
+            if ((input.equals("x")) == true) {
+                break;
+            }
+            CardNumber[i] = input;
+            i++;
+        }
+
+
+        System.out.println("=======================================================================");
+        System.out.printf("%-25s | %-10s | %-25s%n",
+                "Card Number", "Type", "Legitimacy");
+        System.out.println("-----------------------------------------------------------------------");
+        
+        for(int x=0; x<CardNumber.length ; x++){
+            if ((CardNumber[x]) == null) {
+                break;
+            }
+            String CardType = Credit_Type(CardNumber[x]);
+            System.out.printf("%-25s | %-10s | %-25s%n",
+        CardNumber[x], CardType, LuhnAlgorithm(CardNumber[x]));
+        }
+        System.out.println("=======================================================================");
     }
 }
