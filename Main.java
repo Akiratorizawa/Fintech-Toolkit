@@ -73,7 +73,9 @@ public class Main {
     
         switch (option) {
             // TODO, cardValidator()
-            case 1 -> System.out.println("todo, card validator");
+            case 1 -> {
+                creditCardValidator();
+            }
 
             case 2 -> {
                 transitionDelay();
@@ -91,8 +93,7 @@ public class Main {
             }
 
             case 5 -> {
-                // TODO, percentageAndTax()
-                System.out.println("todo, percentage and tax");
+                percentage_and_tax_calc();
             }
 
             case 6 ->  {
