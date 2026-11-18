@@ -1,7 +1,18 @@
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.math.RoundingMode;
 import java.util.Scanner;
-
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.net.http.HttpRequest.BodyPublisher;
+import java.net.http.HttpRequest.BodyPublishers;
+import java.util.regex.Pattern;
+import java.util.regex.Matcher;
 public class Main {
 
     static Scanner scanner = new Scanner(System.in);
@@ -18,9 +29,9 @@ public class Main {
         
         System.out.println("""
             [1] Credit Card Validator
-            [2] Currency Denomination Calculator
-            [3] Monthly Installment Calculator
-            [4] Loan Interest Calculator
+            [2] International Bank Account Number (IBAN) Validator
+            [3] Currency Denomination Calculator
+            [4] Monthly Installment Calculator
             [5] Percentage and Tax Calculator
             [6] Quit\n""");
         
@@ -59,17 +70,17 @@ public class Main {
 
             case 2 -> {
                 transitionDelay();
-                currencyDenomination();
+                IBANvalidator();
             }
 
             case 3 -> {
                 transitionDelay();
-                monthlyInstallment();
+                currencyDenomination();
             }
 
             case 4 -> {
-                // TODO, loanInterest(), will be changed with something else
-                System.out.println("todo, loan interest, will be changed");
+                transitionDelay();
+                monthlyInstallment();
             }
 
             case 5 -> {
@@ -411,6 +422,278 @@ public class Main {
             Thread.sleep(500);
         } catch (InterruptedException e) {
             e.printStackTrace();
+        }
+    }
+
+    public static void IBANvalidator() {
+        Scanner scanner = new Scanner(System.in);
+
+        mainLoop:
+        while (true) {
+            System.out.println("""
+                ======================================================
+                    INTERNATIONAL BANK ACCOUNT NUMBER VALIDATOR
+                ======================================================\n""");
+        
+            System.out.println("This tool verifies International Bank Account Numbers (IBAN) used for cross-border wire transfers.\n");
+            
+            boolean searching = true;
+            String iban = null;
+
+            while (searching) {
+
+                System.out.print("Please enter an IBAN: ");
+
+                iban = scanner.nextLine();
+                iban = iban.replace(" ", "").toUpperCase();
+
+                if (iban.length() < 16) {
+                    System.out.println("The IBAN you entered is not long enough to be a valid IBAN.\n");
+                }
+
+                else if (iban.length() > 34) {
+                    System.out.println("The IBAN you entered is too long to be a valid IBAN.\n");
+                }
+
+                else {
+                    searching = false;
+                    System.out.println();
+                }
+            }
+
+            String countryCode = iban.substring(0, 2);
+            String country = getCountry(countryCode);
+
+            if (country == null) {
+                System.out.println("IBAN STATUS: INVALID\n");
+                if (askToReturn()) {
+                    continue mainLoop;
+                }
+
+                else {
+                    System.out.println("Thank you for using the IBAN validator.");
+                    transitionDelay();
+                    mainMenu();
+                    return;
+                }
+            }
+
+            if (!verifyLength(iban)) {
+                System.out.println("IBAN STATUS: INVALID\n");
+                if (askToReturn()) {
+                    continue mainLoop;
+                }
+
+                else {
+                    System.out.println("Thank you for using the IBAN validator.");
+                    transitionDelay();
+                    mainMenu();
+                    return;
+                }
+            }
+
+            String moveToEnd = iban.substring(0, 4);
+            String bringToStart = iban.substring(4, iban.length());
+
+            String formattedIBAN = bringToStart.concat(moveToEnd);
+            
+            int x = formattedIBAN.length();
+
+            for (int i = 0; i < x; i++) {
+                char curr = formattedIBAN.charAt(i);
+
+                if (!Character.isAlphabetic(curr) && !Character.isDigit(curr)) {
+                    System.out.println("IBAN STATUS: INVALID\n");
+                    if (askToReturn()) {
+                        continue mainLoop;
+                    }
+
+                    else {
+                        System.out.println("Thank you for using the IBAN validator.");
+                        transitionDelay();
+                        mainMenu();
+                        return;
+                    }
+                }
+
+                if (Character.isLetter(curr)) {
+                    int replacement = 10 + (curr % 'A');
+                    
+                    formattedIBAN = formattedIBAN.substring(0, i) + String.valueOf(replacement) + formattedIBAN.substring(i + 1, formattedIBAN.length());
+                }
+
+                x = formattedIBAN.length();
+            }
+
+            BigInteger ibanChecksum = new BigInteger(formattedIBAN);
+
+            System.out.print("IBAN STATUS: ");
+
+            if (ibanChecksum.mod(BigInteger.valueOf(97)).compareTo(BigInteger.valueOf(1)) == 0) {
+                System.out.println("VALID\n");
+                System.out.println("COUNTRY: " + country);
+                getBank(iban);
+            }
+
+            else {
+                System.out.println("INVALID");
+            }
+
+            System.out.println();
+
+            if (askToReturn()) {
+                continue mainLoop;
+            }
+
+            else {
+                System.out.println("Thank you for using the IBAN validator.");
+                transitionDelay();
+                mainMenu();
+                return;
+            }
+        }
+    }
+
+    public static String getCountry(String countryCode) {
+        String path = "resources/iban_rules.csv";
+        String country = null;
+
+        try (BufferedReader br = new BufferedReader(new FileReader(path))) {
+            String line;
+
+            while ((line = br.readLine()) != null) {
+                String[] values = line.split(",");
+                    
+                if (countryCode.equals(values[0])) {
+                    country = values[1];
+                    return country;
+                    
+                }
+            }
+        }
+
+        catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
+    public static boolean verifyLength (String iban) {
+        String path = "resources/iban_rules.csv";
+        String countryCode = iban.substring(0, 2);
+
+        try (BufferedReader br = new BufferedReader(new FileReader(path))) {
+            String line;
+
+            while ((line = br.readLine()) != null) {
+                String[] values = line.split(",");
+                    
+                if (countryCode.equals(values[0]) && iban.length() == Integer.parseInt(values[2])) {
+                    return true;
+                }
+            }
+        }
+
+        catch (IOException e) {
+            e.printStackTrace();
+        }
+
+
+        return false;
+    }
+
+    public static void getBank(String iban) {
+        HttpClient client = HttpClient.newHttpClient();
+        String ibanPayload = "[\"" + iban + "\"]";
+
+        HttpRequest request = HttpRequest.newBuilder()
+                            .uri(URI.create("https://iban-analyzer.com/api/v1/public/analyze"))
+                            .header("Content-Type", "application/json")
+                            .POST(BodyPublishers.ofString(ibanPayload))
+                            .build();
+
+        HttpResponse<String> response = null;
+
+        try {
+            response = client.send(
+                request,
+                HttpResponse.BodyHandlers.ofString()
+            );
+        }
+
+        catch (Exception e) {
+            e.printStackTrace();
+            System.exit(1);
+        }
+
+        Pattern pattern = Pattern.compile("bankDetails(.*?)}");
+        Matcher matcher = pattern.matcher(response.body());
+
+        String bankDetails = null;
+
+        if (matcher.find()) {
+            bankDetails = matcher.group(1);
+        }
+
+        if (bankDetails.contains("\"bankDataAvailable\":false")) {
+            System.out.println("BANK: UNKNOWN");
+            System.out.println("This is due to the IBAN being a published example IBAN for software development, and having possibly no connection to a financial institution.");
+
+            return;
+        }
+
+        String[] details = {"bankName", "bankCity", "bankAddress", "bankZipCode"};
+
+        for (int i = 0; i < details.length; i++) {
+            int index = bankDetails.indexOf(details[i]);
+
+            if (index != -1) {
+                int end = bankDetails.indexOf(",", index);
+
+                if (end == -1) {
+                    end = bankDetails.length();
+                }
+
+                String bankDetail = bankDetails.substring((index + details[i].length()), end)
+                                .replace("\"", "")
+                                .replace(":", "");
+
+                if (details[i].equals("bankZipCode")) {
+                    System.out.println("Bank " + details[i].substring(4, 7) + " " + details[i].substring(7, details[i].length()) + ": " + bankDetail);
+                }
+
+                else {
+                    System.out.println("Bank " + details[i].split("k")[1] + ": " + bankDetail);
+                }
+            }
+        }
+    }
+
+    public static boolean askToReturn() {
+        Scanner scanner = new Scanner(System.in);
+
+        System.out.println("Would you like to validate another IBAN?");
+        System.out.println("Enter Y to continue, and N to return to the main menu.");
+
+        while (true) {
+            System.out.print("Option: ");
+
+            String option = scanner.nextLine();
+
+            if (option.toLowerCase().equals("y")) {
+                System.out.println();
+                return true;
+            }
+
+            else if (option.toLowerCase().equals("n")) {
+                System.out.println();
+                return false;
+            }
+
+            else {
+                System.out.println("Invalid option.\n");
+            }
         }
     }
 }
