@@ -72,8 +72,8 @@ public class Main {
         }
     
         switch (option) {
-            // TODO, cardValidator()
             case 1 -> {
+                transitionDelay();
                 creditCardValidator();
             }
 
@@ -93,6 +93,7 @@ public class Main {
             }
 
             case 5 -> {
+                transitionDelay();
                 percentage_and_tax_calc();
             }
 
