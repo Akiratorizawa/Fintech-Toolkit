@@ -8,7 +8,8 @@ public class percentage_and_tax_calc {
         ====================================================================
                             Percentage and Tax calculator
         ====================================================================
-        Description
+        
+        Calculates Markup, Discount, and Partial Amount.
 
         Choose an option:
         [1] Markup Amount

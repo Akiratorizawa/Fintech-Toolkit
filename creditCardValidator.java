@@ -71,6 +71,8 @@ public static void displayResult(String cardNumber, String type, String legitima
         =======================================================================
                                 Credit Card Validator
         =======================================================================
+
+        This validates Credit Card numbers with its Card Type, and Luhn's Algorhithm
         """);
         System.out.println();
         System.out.println("Enter Q to go back to the main menu.\n");
