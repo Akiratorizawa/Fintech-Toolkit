@@ -106,5 +106,6 @@ public static void displayResult(String cardNumber, String type, String legitima
         CardNumber[x], CardType, LuhnAlgorithm(CardNumber[x]));
         }
         System.out.println("=======================================================================");
+        scan.close();
     }
 }

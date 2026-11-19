@@ -553,7 +553,9 @@ public class Main {
                 mainMenu();
                 return;
             }
+            
         }
+        
     }
 
     public static String getCountry(String countryCode) {
@@ -702,8 +704,13 @@ public class Main {
     //Percentage and Tax Area Start
     public static void percentage_and_tax_calc() {
         Scanner scan = new Scanner(System.in);
-
-        System.out.printf("""
+        //add break code 
+        float base = 0;
+        float rate = 0;
+        float output = 0;
+        String choice;
+        while (true) {
+            System.out.printf("""
         ====================================================================
                             Percentage and Tax calculator
         ====================================================================
@@ -716,13 +723,6 @@ public class Main {
         [3] Partial Amount
         [Q] Quit
         """);
-
-        //add break code 
-        float base = 0;
-        float rate = 0;
-        float output = 0;
-        String choice;
-        while (true) {
         //choice = "";
         System.out.print("Choice: "); //it asks twice??
         choice = scan.nextLine();
@@ -734,42 +734,42 @@ public class Main {
                     rate = scan.nextFloat();
                     output = base + ((base)*(rate));
                     System.out.println(output);
-                    System.out.println();
             }
         }else if(choice.equals("2")){
-            if (askContinuation()) {
+            while ((askContinuation()) == true) {
                     System.out.print("Enter Base Price: ");
                     base = scan.nextFloat();
                     System.out.print("Enter Discount Rate: ");
                     rate = scan.nextFloat();
                     output = base - (base*(rate/100));
                     System.out.println(output);
-                    System.out.println();
                 }
         }else if(choice.equals("3")){
-            if (askContinuation()) {
+            while ((askContinuation()) == true) {
                     System.out.print("Enter Base Price: ");
                     base = scan.nextFloat();
                     System.out.print("Enter Partial Discount Rate: ");
                     rate = scan.nextFloat();
                     output = base*(rate/100);
                     System.out.println(output);
-                    System.out.println();
             }
         }else if(choice.equals("Q")){
-            break;
+                transitionDelay();
+                mainMenu();
+                return;
             }
-            } 
-            choice = "";
+            }
         }
     public static boolean askContinuation() {
         Scanner scan = new Scanner(System.in);
+        System.out.println();
         System.out.println("Continue?   Y/N");
         String choice = scan.nextLine();
-        System.out.println();
         if (choice.equals("Y") || choice.equals("y")) {
+            System.out.println();
             return true;
         } else if (choice.equals("N") || choice.equals("n")) {
+            System.out.println();
             return false;
         }
         return false;
@@ -842,16 +842,19 @@ public static void displayResult(String cardNumber, String type, String legitima
         String[] CardNumber = new String[999]; 
         String input = "";
         int i = 0;
+        boolean searching = true;
 
-        System.out.printf("""
+        while (true){System.out.printf("""
         =======================================================================
                                 Credit Card Validator
         =======================================================================
 
-        This validates Credit Card numbers with its Card Type, and Luhn's Algorhithm
+        This validates Credit Card numbers with its Card Type, and Luhn's Algorhithm.
+
+        Only works with Visa, MasterCard, AMEX, JCB.
         """);
         System.out.println();
-        System.out.println("Enter END to show each credit card validity \nEnter Q to go back to the main menu.\n");
+        System.out.println("Enter X to show each credit card validity \nEnter Q to go back to the main menu.\n");
         while (true) {
             System.out.print("Enter Card Number to Verify: ");
             input = scan.nextLine();
@@ -859,7 +862,7 @@ public static void displayResult(String cardNumber, String type, String legitima
                 System.out.println("Try Again: \n");
             }else if ((input.equals("Q")) == true || (input.equals("q")) == true) {
                 break;
-            }else if ((input.equals("END")) == true || (input.equals("END")) == true) {
+            }else if ((input.equals("X")) == true || (input.equals("X")) == true) {
                 break;
             }else if ((input.matches("[0-9]+")) == false) {
                 System.out.println("Numbers only!");
@@ -868,7 +871,7 @@ public static void displayResult(String cardNumber, String type, String legitima
             i++;
         }
 
-        if ((input.equals("END")) == true || (input.equals("END")) == true) {
+        if ((input.equals("X")) == true) {
             System.out.println("\n\n=======================================================================");
         System.out.printf("%-25s | %-10s | %-25s%n",
                 "Card Number", "Type", "Legitimacy");
@@ -883,25 +886,40 @@ public static void displayResult(String cardNumber, String type, String legitima
         CardNumber[x], CardType, LuhnAlgorithm(CardNumber[x]));
         }
         System.out.println("=======================================================================");
+        
+        transitionDelay();
+            System.out.println("\nWould you like to input another amount?");
+            searching = true;
+            while (searching) {
+                System.out.println("Please enter Y to input again or N to return to the main menu.");
+                System.out.print("Option: ");
 
-        System.out.println("Please enter Y to retry or N to return to the main menu.");
-        while ((scan.nextLine()).equals("END")) {
-            input = scan.nextLine();
-            if (input.equals("Y")) {
-                creditCardValidator();
-            }else if (input.equals("N")) {
-                mainMenu();
-                break;
+                input = scanner.nextLine().toLowerCase();
+
+                if (input.equals("y")) {
+                    i=0;
+                    transitionDelay();
+                    searching = false;
+                }
+
+                else if (input.equals("n")) {
+                    transitionDelay();
+                    searching = false;
+                    mainMenu();
+                    return;
+                }
+
+                else {
+                    System.out.println();
+                }
             }
         }
-        }else if ((input.equals("Q")) == false || (input.equals("q")) == false) {
-            System.out.println("Going back to Main Menu...");
+        if ((input.equals("Q"))==true) {
             transitionDelay();
-            System.out.println();
+            searching = false;
             mainMenu();
             return;
         }
-}
-
-
+    }
+    }
 }
