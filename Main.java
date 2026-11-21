@@ -743,12 +743,13 @@ public class Main {
     //Percentage and Tax Area Start
     public static void percentage_and_tax_calc() {
         Scanner scan = new Scanner(System.in);
-        //add break code 
+        //menu keeps appearing twice
         float base = 0;
         float rate = 0;
         float output = 0;
         String choice;
         while (true) {
+            choice = null;
             System.out.printf("""
         ====================================================================
                             Percentage and Tax calculator
@@ -762,7 +763,6 @@ public class Main {
         [3] Partial Amount
         [Q] Quit
         """);
-        //choice = "";
         System.out.print("Choice: "); //it asks twice??
         choice = scan.nextLine();
         if (choice.equals("1")) {
