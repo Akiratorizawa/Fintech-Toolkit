@@ -1,21 +1,28 @@
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.File;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
+import java.util.List;
 import java.util.Scanner;
+import java.util.Optional;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.net.http.HttpRequest.BodyPublisher;
 import java.net.http.HttpRequest.BodyPublishers;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.time.LocalDate;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 public class Main {
 
     static Scanner scanner = new Scanner(System.in);
+    static String caller;
     public static void main(String[] args) {
         mainMenu();
     }
@@ -130,6 +137,9 @@ public class Main {
                 }
             }
 
+            String originalAmount = String.valueOf(amount);
+            String summary = "";
+
             Long thousands = 0L;
             Long fiveHundreds = 0L;
             Long hundreds = 0L;
@@ -145,44 +155,49 @@ public class Main {
             if (amount >= 1000) {
                 thousands = amount / 1000;
                 amount = amount - (1000 * thousands);
-                System.out.println("Thousands (1000s): " + thousands);
+                summary += "Thousands (1000s): " + thousands + "\n";
             }
 
             if (amount >= 500) {
                 fiveHundreds = amount / 500;
                 amount = amount - (500 * fiveHundreds);
-                System.out.println("Five Hundreds (500s): " + fiveHundreds);
+                summary += "Five Hundreds (500s): " + fiveHundreds + "\n";
 
             }
 
             if (amount >= 100) {
                 hundreds = amount / 100;
                 amount = amount - (100 * hundreds);
-                System.out.println("Hundreds (100s): " + hundreds);
+                summary += "Hundreds (100s): " + hundreds + "\n";
             }
 
             if (amount >= 50) {
                 fiftys = amount / 50;
                 amount = amount - (50 * fiftys);
-                System.out.println("Fiftys (50s): " + fiftys);
+                summary += "Fiftys (50s): " + fiftys + "\n";
             }
 
             if (amount >= 10) {
                 tens = amount / 10;
                 amount = amount - (10 * tens);
-                System.out.println("Tens (10s): " + tens);
+                summary += "Tens (10s): " + tens + "\n";
 
             }
 
             if (amount >= 5) {
                 fives = amount / 5;
                 amount = amount - (5 * fives);
-                System.out.println("Fives (5s): " + fives);
+                summary += "Fives (5s): " + fives + "\n";
             }
 
             if (amount != 0) {
-                System.out.println("Ones (1s): " + amount);
+                summary += "Ones (1s): " + amount + "\n";
             }
+
+            System.out.println(summary);
+
+            summary = "AMOUNT: " + originalAmount + "\n\n" + summary;
+            writeHistory(summary);
 
             searching = true;
 
@@ -346,18 +361,19 @@ public class Main {
             ).setScale(2, RoundingMode.HALF_UP);
 
             BigDecimal remainingBalance = principal;
-            
-            System.out.println("                   ===========================");
-            System.out.println("                        PAYMENT BREAKDOWN");
-            System.out.println("                   ===========================");
+
+            String summary = """
+                                         ===========================
+                                              PAYMENT BREAKDOWN
+                                         ===========================
+            """;
 
             String format = "| %-5s | %-17s | %-16s | %-16s | %-17s |%n";
             String line = "+-------+-------------------+------------------+------------------+-------------------+";
 
-            System.out.println(line);
-            System.out.printf(format, "Month", "Principal Payment", "Interest Payment", "Total Payment", "Remaining Balance");
-            System.out.println(line);
+            summary += line + "\n";
 
+            summary += String.format(format, "Month", "Principal Payment", "Interest Payment", "Total Payment", "Remaining Balance") + line + "\n";
             transitionDelay();
             
             for (int i = 1; i <= months; i++) {
@@ -372,12 +388,19 @@ public class Main {
 
                 BigDecimal totalPayment = interestPayment.add(principalPayment).setScale(2, RoundingMode.HALF_UP);
 
-                System.out.printf(format, i, principalPayment, interestPayment, totalPayment, remainingBalance);
-                System.out.println(line);
+                summary += String.format(format, i, principalPayment, interestPayment, totalPayment, remainingBalance);
+                summary += line;
+
+                if (i != months) {
+                    summary += "\n";
+                }
             }
 
-            System.out.println("Monthly installment breakdown for a principal amount of P" + principalInput + ", and an annual interest rate of " + interestRateInput * 100 + "% over " + months + " months.");
+            summary += "\nMonthly installment breakdown for a principal amount of P" + principalInput + ", and an annual interest rate of " + interestRateInput * 100 + "% over " + months + " months.";
+
+            System.out.println(summary);
             
+            writeHistory(summary);
             transitionDelay();
             System.out.println();
         
@@ -417,16 +440,7 @@ public class Main {
         }
     }
 
-    public static void transitionDelay() {
-        try {
-            Thread.sleep(500);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-    }
-
     public static void IBANvalidator() {
-        Scanner scanner = new Scanner(System.in);
 
         mainLoop:
         while (true) {
@@ -464,8 +478,12 @@ public class Main {
             String countryCode = iban.substring(0, 2);
             String country = getCountry(countryCode);
 
+            String summary = "IBAN: " + iban + "\n\n";
+
             if (country == null) {
-                System.out.println("IBAN STATUS: INVALID\n");
+                summary = summary + "IBAN STATUS: INVALID";
+                System.out.println(summary);
+                writeHistory(summary);
                 if (askToReturn()) {
                     continue mainLoop;
                 }
@@ -479,7 +497,9 @@ public class Main {
             }
 
             if (!verifyLength(iban)) {
-                System.out.println("IBAN STATUS: INVALID\n");
+                summary = summary + "IBAN STATUS: INVALID";
+                System.out.println(summary);
+                writeHistory(summary);
                 if (askToReturn()) {
                     continue mainLoop;
                 }
@@ -503,7 +523,9 @@ public class Main {
                 char curr = formattedIBAN.charAt(i);
 
                 if (!Character.isAlphabetic(curr) && !Character.isDigit(curr)) {
-                    System.out.println("IBAN STATUS: INVALID\n");
+                    summary = summary + "IBAN STATUS: INVALID";
+                    System.out.println(summary);
+                    writeHistory(summary);
                     if (askToReturn()) {
                         continue mainLoop;
                     }
@@ -527,17 +549,18 @@ public class Main {
 
             BigInteger ibanChecksum = new BigInteger(formattedIBAN);
 
-            System.out.print("IBAN STATUS: ");
+            summary = summary + "IBAN STATUS: ";
 
             if (ibanChecksum.mod(BigInteger.valueOf(97)).compareTo(BigInteger.valueOf(1)) == 0) {
-                System.out.println("VALID\n");
-                System.out.println("COUNTRY: " + country);
-                getBank(iban);
+                summary = summary + "VALID" + "\nCOUNTRY: " + country + "\n\n" + getBank(iban);
             }
 
             else {
-                System.out.println("INVALID");
+                summary = summary + "INVALID";
             }
+
+            System.out.println(summary);
+            writeHistory(summary);
 
             System.out.println();
 
@@ -603,7 +626,7 @@ public class Main {
         return false;
     }
 
-    public static void getBank(String iban) {
+    public static String getBank(String iban) {
         HttpClient client = HttpClient.newHttpClient();
         String ibanPayload = "[\"" + iban + "\"]";
 
@@ -637,16 +660,27 @@ public class Main {
         }
 
         if (bankDetails.contains("\"bankDataAvailable\":false")) {
-            System.out.println("BANK: UNKNOWN");
-            System.out.println("This is due to the IBAN being a published example IBAN for software development, and having possibly no connection to a financial institution.");
-
-            return;
+            return """
+            BANK: UNKNOWN
+            This is due to the IBAN being a published example IBAN for software development, and having possibly no connection to a real financial institution.
+            """;
         }
 
         String[] details = {"bankName", "bankCity", "bankAddress", "bankZipCode"};
+        String summary = "";
 
         for (int i = 0; i < details.length; i++) {
             int index = bankDetails.indexOf(details[i]);
+
+            String category = null;
+
+            if (details[i].equals("bankZipCode")) {
+                category = "Bank " + details[i].substring(4, 7) + " " + details[i].substring(7, details[i].length()) + ": ";
+            }
+
+            else {
+                category = "Bank " + details[i].split("k")[1] + ": ";
+            }
 
             if (index != -1) {
                 int end = bankDetails.indexOf(",", index);
@@ -659,21 +693,19 @@ public class Main {
                                 .replace("\"", "")
                                 .replace(":", "");
 
-                if (details[i].equals("bankZipCode")) {
-                    System.out.println("Bank " + details[i].substring(4, 7) + " " + details[i].substring(7, details[i].length()) + ": " + bankDetail);
-                }
+                summary = summary + category + bankDetail + "\n";
+            }
 
-                else {
-                    System.out.println("Bank " + details[i].split("k")[1] + ": " + bankDetail);
-                }
+            else {
+                summary = summary + category + "UNKNOWN\n";
             }
         }
+
+        return summary;
     }
 
     public static boolean askToReturn() {
-        Scanner scanner = new Scanner(System.in);
-
-        System.out.println("Would you like to validate another IBAN?");
+        System.out.println("Would you like to continue entering more values?");
         System.out.println("Enter Y to continue, and N to return to the main menu.");
 
         while (true) {
@@ -694,6 +726,116 @@ public class Main {
             else {
                 System.out.println("Invalid option.\n");
             }
+        }
+    }
+
+    public static void transitionDelay() {
+        try {
+            Thread.sleep(500);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void writeHistory(String summary) {
+        File historyFile = new File("history.txt");
+
+        try {
+            historyFile.createNewFile();
+        }
+
+        catch (IOException e) {
+            System.out.println("There was an error in writing to history.\n");
+            return;
+        }
+
+
+        Path historyPath = Paths.get("history.txt");
+
+        String sectionBoundary = "----------------------------------------------";
+        LocalDate currentDate = LocalDate.now();
+
+        summary = currentDate + "\n" + summary + "\n";
+
+        // Find caller of this method
+        Optional<StackWalker.StackFrame> callerFrame = StackWalker.getInstance()
+                                                    .walk(frames -> frames.skip(1).findFirst());
+
+        callerFrame.ifPresent(frame -> {
+            caller = frame.getMethodName();
+        });
+
+        // Ordering in history txt, based off this boundary string "----------------------------------------------"
+        // 1. IBANvalidator
+        // 2. currencyDenomination
+        // 3. monthlyInstallment
+
+        String[] callers = {"IBANvalidator", "currencyDenomination", "monthlyInstallment"};
+        int callerBoundary = 0;
+
+        // The array callers is made in order of their boundary lines in history.txt
+        // callerBoundary = 1 would be the first boundary line, since callers[1 - 1] = "IBANvalidator", then it corresponds to the section for the iban validator history
+
+        for (int i = 0; i < callers.length; i++) {
+            if (callers[i].equals(caller)) {
+                callerBoundary = i + 1;
+            }
+        }
+
+        int boundaryIndex = 0;
+
+        try {
+            List<String> lines = Files.readAllLines(historyPath);
+
+            if (lines.isEmpty()) {
+                String initialFormat = """
+==============================================
+            IBAN VALIDATOR HISTORY
+==============================================
+
+----------------------------------------------
+
+==============================================
+        CURRENCY DENOMINATION HISTORY
+==============================================
+
+----------------------------------------------
+
+==============================================
+          MONTHLY INSTALLMENT HISTORY
+==============================================
+
+----------------------------------------------""";
+                
+                lines.add(initialFormat);
+                Files.write(historyPath, lines);
+
+                lines = Files.readAllLines(historyPath);
+            }
+
+            int boundaryLines = 0;
+
+            for (int i = 0; i < lines.size(); i++) {
+                String line = lines.get(i);
+
+                if (line.equals(sectionBoundary)) {
+                    boundaryLines++;
+                }
+
+                if (boundaryLines == callerBoundary) {
+                    boundaryIndex = i;
+                    break;
+                }
+            }
+
+            lines.add(boundaryIndex, summary);
+            Files.write(historyPath, lines);
+
+        }
+
+        catch (IOException e) {
+            System.out.println("There was an error in writing to history.\n");
+            return;
         }
     }
 }
