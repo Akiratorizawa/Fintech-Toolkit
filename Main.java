@@ -5,6 +5,7 @@ import java.io.File;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 import java.util.Optional;
@@ -19,6 +20,7 @@ import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
+
 public class Main {
 
     static Scanner scanner = new Scanner(System.in);
@@ -747,13 +749,11 @@ public class Main {
     public static void percentage_and_tax_calc() {
         Scanner scan = new Scanner(System.in);
         //menu keeps appearing twice
-        float base = 0;
-        float rate = 0;
-        float output = 0;
         String choice;
+        
         while (true) {
             choice = null;
-            System.out.printf("""
+            System.out.println("""
         ====================================================================
                             Percentage and Tax calculator
         ====================================================================
@@ -768,53 +768,103 @@ public class Main {
         """);
         System.out.print("Choice: "); //it asks twice??
         choice = scan.nextLine();
+        
+        String input = null;
         if (choice.equals("1")) {
-            while ((askContinuation()) == true) {
-                    System.out.print("Enter Base Price: ");
-                    base = scan.nextFloat();
-                    System.out.print("Enter Markup Rate: ");
-                    rate = scan.nextFloat();
-                    output = base + ((base)*(rate));
-                    System.out.println(output);
-            }
-        }else if(choice.equals("2")){
-            while ((askContinuation()) == true) {
-                    System.out.print("Enter Base Price: ");
-                    base = scan.nextFloat();
-                    System.out.print("Enter Discount Rate: ");
-                    rate = scan.nextFloat();
-                    output = base - (base*(rate/100));
-                    System.out.println(output);
+
+            boolean searching = true;
+            Double base = null;
+
+            while (searching) {
+                System.out.print("Enter Base Price: ");
+                input = scan.nextLine();
+
+                try {
+                    base = Double.parseDouble(input);
+
+                    if (base > 0) {
+                        searching = false;
+                    }
+                    
+                    else {
+                        System.out.println("Please enter a number.\n");
+                    }
                 }
-        }else if(choice.equals("3")){
-            while ((askContinuation()) == true) {
-                    System.out.print("Enter Base Price: ");
-                    base = scan.nextFloat();
-                    System.out.print("Enter Partial Discount Rate: ");
-                    rate = scan.nextFloat();
-                    output = base*(rate/100);
-                    System.out.println(output);
+
+                catch (NumberFormatException e) {
+                    System.out.println("Please enter a number.\n");
+                }
+
             }
-        }else if(choice.equals("Q")){
-                transitionDelay();
+
+            System.out.print("Enter Markup Rate: ");
+            input = scan.nextLine();
+            Double rate = null;
+
+            try {
+                rate = Double.parseDouble(input) / 100;
+            }
+
+            catch (NumberFormatException e) {
+                System.out.println("Please enter a number.");
+            }
+
+            Double output = base + ((base)*(rate));
+
+            System.out.println(output);
+
+            boolean willContinue = askContinuation();
+
+            if (willContinue) {
+                continue;
+            }
+
+            else {
                 mainMenu();
-                return;
+                break;
             }
+
+        // }else if(choice.equals("2")){
+        //     while ((askContinuation()) == true) {
+        //             System.out.print("Enter Base Price: ");
+        //             base = scan.nextFloat();
+        //             System.out.print("Enter Discount Rate: ");
+        //             rate = scan.nextFloat();
+        //             output = base - (base*(rate/100));
+        //             System.out.println(output);
+        //         }
+        // }else if(choice.equals("3")){
+        //     while ((askContinuation()) == true) {
+        //             System.out.print("Enter Base Price: ");
+        //             base = scan.nextFloat();
+        //             System.out.print("Enter Partial Discount Rate: ");
+        //             rate = scan.nextFloat();
+        //             output = base*(rate/100);
+        //             System.out.println(output);
+        //     }
+        // }else if(choice.equals("Q")){
+        //         transitionDelay();
+        //         mainMenu();
+        //         return;
+        //     }
+                }
             }
         }
     public static boolean askContinuation() {
         Scanner scan = new Scanner(System.in);
         System.out.println();
-        System.out.println("Continue?   Y/N");
-        String choice = scan.nextLine();
-        if (choice.equals("Y") || choice.equals("y")) {
-            System.out.println();
-            return true;
-        } else if (choice.equals("N") || choice.equals("n")) {
-            System.out.println();
-            return false;
+
+        while (true) {
+            System.out.println("Continue?   Y/N");
+            String choice = scan.nextLine();
+            if (choice.equals("Y") || choice.equals("y")) {
+                System.out.println();
+                return true;
+            } else if (choice.equals("N") || choice.equals("n")) {
+                System.out.println();
+                return false;
+            }
         }
-        return false;
     }
 //Area End
 
@@ -844,21 +894,22 @@ public class Main {
         int toBeAdded = 0;
         int toBeMultiplied = 0;
         for(int i = 1; i <= max; i++){
+            int current = Character.getNumericValue(CardNumberArray[(number.length())-i]);
             if (i%2 != 0) {
-                toBeAdded += Character.getNumericValue(CardNumberArray[(number.length())-i]);
+                toBeAdded += current;
             }else {
-                if ((Character.getNumericValue(CardNumberArray[(number.length())-i])) * 2 >=10) {
-                    toBeMultiplied += (Character.getNumericValue(CardNumberArray[(number.length())-i])*2) % 10 + (Character.getNumericValue(CardNumberArray[(number.length())-i])*2) / 10;
+                if (current * 2 >=10) {
+                    toBeMultiplied += (current * 2) % 10 + (current * 2) / 10;
                 }
 
                 else {
-                toBeMultiplied += (Character.getNumericValue(CardNumberArray[(number.length())-i])*2);
+                toBeMultiplied += (current * 2);
                 }
             }
         }
-        if (((toBeAdded+toBeMultiplied)%10)==0) {
+        if ((toBeAdded+toBeMultiplied) % 10 == 0) {
             return "Card is Legitimate!";
-        } else{
+        } else {
             return "Card is Illegitimate!";
         }
     }
@@ -896,7 +947,7 @@ public class Main {
         // 2. currencyDenomination
         // 3. monthlyInstallment
 
-        String[] callers = {"IBANvalidator", "currencyDenomination", "monthlyInstallment"};
+        String[] callers = {"creditCardValidator", "IBANvalidator", "currencyDenomination", "monthlyInstallment"};
         int callerBoundary = 0;
 
         // The array callers is made in order of their boundary lines in history.txt
@@ -915,6 +966,12 @@ public class Main {
 
             if (lines.isEmpty()) {
                 String initialFormat = """
+==============================================
+         CREDIT CARD VALIDATOR HISTORY
+==============================================
+
+----------------------------------------------
+
 ==============================================
             IBAN VALIDATOR HISTORY
 ==============================================
@@ -981,88 +1038,115 @@ public static void displayResult(String cardNumber, String type, String legitima
 
     public static void creditCardValidator(){
         Scanner scan = new Scanner(System.in);
+
         //all input as string
-        String[] CardNumber = new String[999]; 
+        ArrayList<String> CardNumber = new ArrayList<>();
         String input = "";
-        int i = 0;
         boolean searching = true;
 
-        while (true){System.out.printf("""
+        while (true) {
+            System.out.printf("""
         =======================================================================
                                 Credit Card Validator
         =======================================================================
 
-        This validates Credit Card numbers with its Card Type, and Luhn's Algorhithm.
+        This validates Credit Card numbers with its Card Type, and Luhn's Algorithm.
 
         Only works with Visa, MasterCard, AMEX, JCB.
         """);
+
         System.out.println();
         System.out.println("Enter X to show each credit card validity \nEnter Q to go back to the main menu.\n");
+
         while (true) {
+
             System.out.print("Enter Card Number to Verify: ");
+
             input = scan.nextLine();
+
             if (input.isEmpty() == true) {
                 System.out.println("Try Again: \n");
-            }else if ((input.equals("Q")) == true || (input.equals("q")) == true) {
+            } 
+            
+            else if (input.toLowerCase().equals("q")) {
                 break;
-            }else if ((input.equals("X")) == true || (input.equals("X")) == true) {
+            } 
+            
+            else if ((input.toLowerCase().equals("x")) == true) {
                 break;
-            }else if ((input.matches("[0-9]+")) == false) {
+            } 
+            
+            else if ((input.matches("[0-9]+")) == false) {
                 System.out.println("Numbers only!");
             }
-            CardNumber[i] = input;
-            i++;
-        }
 
-        if ((input.equals("X")) == true) {
-            System.out.println("\n\n=======================================================================");
-        System.out.printf("%-25s | %-10s | %-25s%n",
-                "Card Number", "Type", "Legitimacy");
-        System.out.println("-----------------------------------------------------------------------");
+            CardNumber.add(input);
+        }
         
-        for(int x=0; x<CardNumber.length ; x++){
-            if ((CardNumber[x]) == null || ((CardNumber[x]).matches("[0-9]+")) == false) {
+        String summary = "";
+
+        if ((input.toLowerCase().equals("x")) == true) {
+            System.out.println("\n");
+
+            summary += "=======================================================================\n";
+
+            summary += String.format("%-25s | %-10s | %-25s%n",
+                "Card Number", "Type", "Legitimacy");
+
+            summary += "-----------------------------------------------------------------------\n";
+        
+        for(int x = 0; x < CardNumber.size(); x++) {
+            if ((CardNumber.get(x)) == null || ((CardNumber.get(x)).matches("[0-9]+")) == false) {
                 continue;
             }
-            String CardType = Credit_Type(CardNumber[x]);
-            System.out.printf("%-25s | %-10s | %-25s%n",
-        CardNumber[x], CardType, LuhnAlgorithm(CardNumber[x]));
+
+            String CardType = Credit_Type(CardNumber.get(x));
+            
+            summary += String.format("%-25s | %-10s | %-25s%n",
+                        CardNumber.get(x), CardType, LuhnAlgorithm(CardNumber.get(x)));
         }
-        System.out.println("=======================================================================");
-        
+
+        summary += "=======================================================================";
+
+        System.out.println(summary);
+        writeHistory(summary);
+
         transitionDelay();
-            System.out.println("\nWould you like to input another amount?");
-            searching = true;
-            while (searching) {
-                System.out.println("Please enter Y to input again or N to return to the main menu.");
-                System.out.print("Option: ");
+        
+        System.out.println("\nWould you like to input another amount?");
 
-                input = scanner.nextLine().toLowerCase();
+        searching = true;
 
-                if (input.equals("y")) {
-                    i=0;
-                    transitionDelay();
-                    searching = false;
-                }
+        while (searching) {
 
-                else if (input.equals("n")) {
-                    transitionDelay();
-                    searching = false;
-                    mainMenu();
-                    return;
-                }
+            System.out.println("Please enter Y to input again or N to return to the main menu.");
+            System.out.print("Option: ");
 
-                else {
-                    System.out.println();
-                }
+            input = scanner.nextLine().toLowerCase();
+
+            if (input.equals("y")) {
+                transitionDelay();
+                searching = false;
+            }
+
+            else if (input.equals("n")) {
+                transitionDelay();
+                searching = false;
+                mainMenu();
+                return;
+            }
+
+            else {
+                System.out.println();
             }
         }
-        if ((input.equals("Q"))==true) {
-            transitionDelay();
-            searching = false;
-            mainMenu();
-            return;
-        }
+    }
+    if ((input.equals("Q"))==true) {
+        transitionDelay();
+        searching = false;
+        mainMenu();
+        return;
+    }
     }
     }
 }
