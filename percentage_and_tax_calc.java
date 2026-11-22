@@ -24,8 +24,8 @@ public class percentage_and_tax_calc {
         float output = 0;
         String choice;
         while (true) {
-        //choice = "";
-        System.out.print("Choice: "); //it asks twice??
+        choice = "";
+        System.out.print("Choice: "); //it asks somehow twice??
         choice = scan.nextLine();
         if (choice.equals("1")) {
             while ((askContinuation()) == true) {

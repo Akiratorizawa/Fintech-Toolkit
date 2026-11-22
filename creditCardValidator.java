@@ -73,9 +73,11 @@ public static void displayResult(String cardNumber, String type, String legitima
         =======================================================================
 
         This validates Credit Card numbers with its Card Type, and Luhn's Algorhithm
+
+        Only works with Visa, MasterCard, AMEX, and JCB Cards Only.
         """);
         System.out.println();
-        System.out.println("Enter Q to go back to the main menu.\n");
+        System.out.println("Enter Q to stop requesting numbers.\n");
         //need alphabet checker
         while (true) {
             System.out.print("Enter Card Number to Verify: ");
