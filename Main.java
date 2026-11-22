@@ -733,13 +733,16 @@ public class Main {
         }
     }
 
-<<<<<<< HEAD
     public static void transitionDelay() {
         try {
             Thread.sleep(500);
-        } catch (InterruptedException e) {
+        }
+
+        catch (InterruptedException e) {
             e.printStackTrace();
-=======
+        }
+    }
+
     //Percentage and Tax Area Start
     public static void percentage_and_tax_calc() {
         Scanner scan = new Scanner(System.in);
@@ -857,14 +860,12 @@ public class Main {
             return "Card is Legitimate!";
         } else{
             return "Card is Illegitimate!";
->>>>>>> 539b93f (	modified:   Main.java)
         }
     }
 
     public static void writeHistory(String summary) {
         File historyFile = new File("history.txt");
 
-<<<<<<< HEAD
         try {
             historyFile.createNewFile();
         }
@@ -962,7 +963,6 @@ public class Main {
             System.out.println("There was an error in writing to history.\n");
             return;
         }
-=======
 public static void displayResult(String cardNumber, String type, String legitimacy) {
 
     System.out.println("====================================================================");
@@ -1062,6 +1062,5 @@ public static void displayResult(String cardNumber, String type, String legitima
             return;
         }
     }
->>>>>>> 539b93f (	modified:   Main.java)
     }
 }
