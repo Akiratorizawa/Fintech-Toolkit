@@ -72,8 +72,10 @@ public class Main {
         }
     
         switch (option) {
-            // TODO, cardValidator()
-            case 1 -> System.out.println("todo, card validator");
+            case 1 -> {
+                transitionDelay();
+                creditCardValidator();
+            }
 
             case 2 -> {
                 transitionDelay();
@@ -91,8 +93,8 @@ public class Main {
             }
 
             case 5 -> {
-                // TODO, percentageAndTax()
-                System.out.println("todo, percentage and tax");
+                transitionDelay();
+                percentage_and_tax_calc();
             }
 
             case 6 ->  {
@@ -574,7 +576,9 @@ public class Main {
                 mainMenu();
                 return;
             }
+            
         }
+        
     }
 
     public static String getCountry(String countryCode) {
@@ -732,8 +736,130 @@ public class Main {
     public static void transitionDelay() {
         try {
             Thread.sleep(500);
-        } catch (InterruptedException e) {
+        }
+
+        catch (InterruptedException e) {
             e.printStackTrace();
+        }
+    }
+
+    //Percentage and Tax Area Start
+    public static void percentage_and_tax_calc() {
+        Scanner scan = new Scanner(System.in);
+        //menu keeps appearing twice
+        float base = 0;
+        float rate = 0;
+        float output = 0;
+        String choice;
+        while (true) {
+            choice = null;
+            System.out.printf("""
+        ====================================================================
+                            Percentage and Tax calculator
+        ====================================================================
+        
+        Calculates Markup, Discount, and Partial Amount.
+
+        Choose an option:
+        [1] Markup Amount
+        [2] Discount Amount
+        [3] Partial Amount
+        [Q] Quit
+        """);
+        System.out.print("Choice: "); //it asks twice??
+        choice = scan.nextLine();
+        if (choice.equals("1")) {
+            while ((askContinuation()) == true) {
+                    System.out.print("Enter Base Price: ");
+                    base = scan.nextFloat();
+                    System.out.print("Enter Markup Rate: ");
+                    rate = scan.nextFloat();
+                    output = base + ((base)*(rate));
+                    System.out.println(output);
+            }
+        }else if(choice.equals("2")){
+            while ((askContinuation()) == true) {
+                    System.out.print("Enter Base Price: ");
+                    base = scan.nextFloat();
+                    System.out.print("Enter Discount Rate: ");
+                    rate = scan.nextFloat();
+                    output = base - (base*(rate/100));
+                    System.out.println(output);
+                }
+        }else if(choice.equals("3")){
+            while ((askContinuation()) == true) {
+                    System.out.print("Enter Base Price: ");
+                    base = scan.nextFloat();
+                    System.out.print("Enter Partial Discount Rate: ");
+                    rate = scan.nextFloat();
+                    output = base*(rate/100);
+                    System.out.println(output);
+            }
+        }else if(choice.equals("Q")){
+                transitionDelay();
+                mainMenu();
+                return;
+            }
+            }
+        }
+    public static boolean askContinuation() {
+        Scanner scan = new Scanner(System.in);
+        System.out.println();
+        System.out.println("Continue?   Y/N");
+        String choice = scan.nextLine();
+        if (choice.equals("Y") || choice.equals("y")) {
+            System.out.println();
+            return true;
+        } else if (choice.equals("N") || choice.equals("n")) {
+            System.out.println();
+            return false;
+        }
+        return false;
+    }
+//Area End
+
+//Card Validator Area
+    public static String Credit_Type(String number){
+        if (number.length()>=13 && number.length()<=19 && number.length() != 14) {
+            int firstFourNumbers = Integer.parseInt(number.substring(0, 4));
+
+            if (firstFourNumbers>=3528 && firstFourNumbers<=3589) {
+                return "JCB";
+            }
+
+            if (number.startsWith("34") || number.startsWith("37")) {
+                return "AMEX";
+            }else if (number.startsWith("51") || number.startsWith("52") || number.startsWith("53") || number.startsWith("54") || number.startsWith("55")) {
+                return "MasterCard";
+            }else if (number.startsWith("4")) {
+                return "Visa";
+            }
+        }
+        return "Invalid Card Number";
+    }
+
+    public static String LuhnAlgorithm(String number){
+        char[] CardNumberArray = number.toCharArray();
+        int max = (CardNumberArray.length);
+        int toBeAdded = 0;
+        int toBeMultiplied = 0;
+        for(int i = 1; i <= max; i++){
+            if (i%2 != 0) {
+                toBeAdded += Character.getNumericValue(CardNumberArray[(number.length())-i]);
+            }else {
+                if ((Character.getNumericValue(CardNumberArray[(number.length())-i])) * 2 >=10) {
+                    toBeMultiplied += (Character.getNumericValue(CardNumberArray[(number.length())-i])*2) % 10 + (Character.getNumericValue(CardNumberArray[(number.length())-i])*2) / 10;
+                }
+
+                else {
+                toBeMultiplied += (Character.getNumericValue(CardNumberArray[(number.length())-i])*2);
+                }
+            }
+        }
+        if (((toBeAdded+toBeMultiplied)%10)==0) {
+            return "Card is Legitimate!";
+        } else{
+            return "Card is Illegitimate!";
         }
     }
 
@@ -837,5 +963,106 @@ public class Main {
             System.out.println("There was an error in writing to history.\n");
             return;
         }
+    }
+    
+public static void displayResult(String cardNumber, String type, String legitimacy) {
+
+    System.out.println("====================================================================");
+    System.out.printf("%-25s | %-18s | %-15s%n",
+            "Card Number", "Type", "Legitimacy");
+    System.out.println("--------------------------------------------------------------------");
+
+    System.out.printf("%-25s | %-18s | %-15s%n",
+            cardNumber, type, legitimacy);
+
+    System.out.println("====================================================================");
+}
+
+
+    public static void creditCardValidator(){
+        Scanner scan = new Scanner(System.in);
+        //all input as string
+        String[] CardNumber = new String[999]; 
+        String input = "";
+        int i = 0;
+        boolean searching = true;
+
+        while (true){System.out.printf("""
+        =======================================================================
+                                Credit Card Validator
+        =======================================================================
+
+        This validates Credit Card numbers with its Card Type, and Luhn's Algorhithm.
+
+        Only works with Visa, MasterCard, AMEX, JCB.
+        """);
+        System.out.println();
+        System.out.println("Enter X to show each credit card validity \nEnter Q to go back to the main menu.\n");
+        while (true) {
+            System.out.print("Enter Card Number to Verify: ");
+            input = scan.nextLine();
+            if (input.isEmpty() == true) {
+                System.out.println("Try Again: \n");
+            }else if ((input.equals("Q")) == true || (input.equals("q")) == true) {
+                break;
+            }else if ((input.equals("X")) == true || (input.equals("X")) == true) {
+                break;
+            }else if ((input.matches("[0-9]+")) == false) {
+                System.out.println("Numbers only!");
+            }
+            CardNumber[i] = input;
+            i++;
+        }
+
+        if ((input.equals("X")) == true) {
+            System.out.println("\n\n=======================================================================");
+        System.out.printf("%-25s | %-10s | %-25s%n",
+                "Card Number", "Type", "Legitimacy");
+        System.out.println("-----------------------------------------------------------------------");
+        
+        for(int x=0; x<CardNumber.length ; x++){
+            if ((CardNumber[x]) == null || ((CardNumber[x]).matches("[0-9]+")) == false) {
+                continue;
+            }
+            String CardType = Credit_Type(CardNumber[x]);
+            System.out.printf("%-25s | %-10s | %-25s%n",
+        CardNumber[x], CardType, LuhnAlgorithm(CardNumber[x]));
+        }
+        System.out.println("=======================================================================");
+        
+        transitionDelay();
+            System.out.println("\nWould you like to input another amount?");
+            searching = true;
+            while (searching) {
+                System.out.println("Please enter Y to input again or N to return to the main menu.");
+                System.out.print("Option: ");
+
+                input = scanner.nextLine().toLowerCase();
+
+                if (input.equals("y")) {
+                    i=0;
+                    transitionDelay();
+                    searching = false;
+                }
+
+                else if (input.equals("n")) {
+                    transitionDelay();
+                    searching = false;
+                    mainMenu();
+                    return;
+                }
+
+                else {
+                    System.out.println();
+                }
+            }
+        }
+        if ((input.equals("Q"))==true) {
+            transitionDelay();
+            searching = false;
+            mainMenu();
+            return;
+        }
+    }
     }
 }
