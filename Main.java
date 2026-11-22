@@ -963,6 +963,8 @@ public class Main {
             System.out.println("There was an error in writing to history.\n");
             return;
         }
+    }
+    
 public static void displayResult(String cardNumber, String type, String legitimacy) {
 
     System.out.println("====================================================================");
