@@ -42,14 +42,15 @@ public class Main {
             [3] Currency Denomination Calculator
             [4] Monthly Installment Calculator
             [5] Percentage and Tax Calculator
-            [6] Quit\n""");
+            [6] View History
+            [7] Quit\n""");
         
         boolean searching = true;
         int option = 0;
 
         // Looping for valid user input
         while (searching) {
-            System.out.println("Please enter a number from 1 to 6.");
+            System.out.println("Please enter a number from 1 to 7.");
             System.out.print("Option: ");
 
             
@@ -58,7 +59,7 @@ public class Main {
             try {
                 option = Integer.parseInt(input);
 
-                if (option >= 1 && option <= 6) {
+                if (option >= 1 && option <= 7) {
                     searching = false;
                     System.out.println();
                 }
@@ -100,10 +101,17 @@ public class Main {
             }
 
             case 6 ->  {
+                transitionDelay();
+                viewHistory();
+            }
+
+            case 7 ->  {
                 System.out.println("Thank you for using Fintech Toolkit.");
                 transitionDelay();
                 return;
             }
+
+            
         }
     }
 
@@ -811,7 +819,11 @@ public class Main {
 
             Double output = base + ((base)*(rate));
 
-            System.out.println(output);
+            String summary = "Marked Up Price: " + output;
+            System.out.println(summary);
+
+            summary = "Amount: " + input + "\nOperation: Markup\n" + "Rate: " + rate + "\n" + summary;
+            writeHistory(summary);
 
             boolean willContinue = askContinuation();
 
@@ -824,32 +836,136 @@ public class Main {
                 break;
             }
 
-        // }else if(choice.equals("2")){
-        //     while ((askContinuation()) == true) {
-        //             System.out.print("Enter Base Price: ");
-        //             base = scan.nextFloat();
-        //             System.out.print("Enter Discount Rate: ");
-        //             rate = scan.nextFloat();
-        //             output = base - (base*(rate/100));
-        //             System.out.println(output);
-        //         }
-        // }else if(choice.equals("3")){
-        //     while ((askContinuation()) == true) {
-        //             System.out.print("Enter Base Price: ");
-        //             base = scan.nextFloat();
-        //             System.out.print("Enter Partial Discount Rate: ");
-        //             rate = scan.nextFloat();
-        //             output = base*(rate/100);
-        //             System.out.println(output);
-        //     }
-        // }else if(choice.equals("Q")){
-        //         transitionDelay();
-        //         mainMenu();
-        //         return;
-        //     }
+        }
+        
+        else if (choice.equals("2")) {
+
+            boolean searching = true;
+            Double base = null;
+
+            while (searching) {
+                System.out.print("Enter Base Price: ");
+                input = scan.nextLine();
+
+                try {
+                    base = Double.parseDouble(input);
+
+                    if (base > 0) {
+                        searching = false;
+                    }
+                    
+                    else {
+                        System.out.println("Please enter a number.\n");
+                    }
                 }
+
+                catch (NumberFormatException e) {
+                    System.out.println("Please enter a number.\n");
+                }
+
+            }
+
+            System.out.print("Enter Discount Rate: ");
+            input = scan.nextLine();
+            Double rate = null;
+
+            try {
+                rate = Double.parseDouble(input) / 100;
+            }
+
+            catch (NumberFormatException e) {
+                System.out.println("Please enter a number.");
+            }
+
+            Double output = base - (base * rate);
+
+            String summary = "Discounted Price: " + output;
+            System.out.println(summary);
+
+            summary = "Amount: " + input + "\nOperation: Discount\n" + summary;
+            writeHistory(summary);
+
+            boolean willContinue = askContinuation();
+
+            if (willContinue) {
+                continue;
+            }
+
+            else {
+                mainMenu();
+                break;
+            }
+
+        }
+
+        else if (choice.equals("3")) {
+
+            boolean searching = true;
+            Double base = null;
+
+            while (searching) {
+                System.out.print("Enter Base Price: ");
+                input = scan.nextLine();
+
+                try {
+                    base = Double.parseDouble(input);
+
+                    if (base > 0) {
+                        searching = false;
+                    }
+                    
+                    else {
+                        System.out.println("Please enter a number.\n");
+                    }
+                }
+
+                catch (NumberFormatException e) {
+                    System.out.println("Please enter a number.\n");
+                }
+
+            }
+
+            System.out.print("Enter Percentage: ");
+            input = scan.nextLine();
+            Double rate = null;
+
+            try {
+                rate = Double.parseDouble(input) / 100;
+            }
+
+            catch (NumberFormatException e) {
+                System.out.println("Please enter a number.");
+            }
+
+            Double output = base * rate;
+
+            String summary = "Partial Amount: " + output;
+            System.out.println(summary);
+
+            summary = "Amount: " + input + "\nOperation: Partial Amount\n" + "Percentage: " + rate + "\n" + summary;
+            writeHistory(summary);
+
+            boolean willContinue = askContinuation();
+
+            if (willContinue) {
+                continue;
+            }
+
+            else {
+                mainMenu();
+                break;
+            }
+
+        }
+
+        else if (choice.equals("Q")) {
+                transitionDelay();
+                mainMenu();
+                return;
             }
         }
+    }
+
     public static boolean askContinuation() {
         Scanner scan = new Scanner(System.in);
         System.out.println();
@@ -870,7 +986,7 @@ public class Main {
 
 //Card Validator Area
     public static String Credit_Type(String number){
-        if (number.length()>=13 && number.length()<=19 && number.length() != 14) {
+        if (number.length() >= 13 && number.length() <= 19 && number.length() != 14) {
             int firstFourNumbers = Integer.parseInt(number.substring(0, 4));
 
             if (firstFourNumbers>=3528 && firstFourNumbers<=3589) {
@@ -879,12 +995,18 @@ public class Main {
 
             if (number.startsWith("34") || number.startsWith("37")) {
                 return "AMEX";
-            }else if (number.startsWith("51") || number.startsWith("52") || number.startsWith("53") || number.startsWith("54") || number.startsWith("55")) {
+            } 
+            
+            else if (number.startsWith("51") || number.startsWith("52") || number.startsWith("53") || number.startsWith("54") || number.startsWith("55")) {
                 return "MasterCard";
-            }else if (number.startsWith("4")) {
+            } 
+            
+            
+            else if (number.startsWith("4")) {
                 return "Visa";
             }
         }
+
         return "Invalid Card Number";
     }
 
@@ -893,23 +1015,29 @@ public class Main {
         int max = (CardNumberArray.length);
         int toBeAdded = 0;
         int toBeMultiplied = 0;
-        for(int i = 1; i <= max; i++){
+
+        for(int i = 1; i <= max; i++) {
             int current = Character.getNumericValue(CardNumberArray[(number.length())-i]);
+            
             if (i%2 != 0) {
                 toBeAdded += current;
-            }else {
-                if (current * 2 >=10) {
+            }
+            
+            else {
+                if (current * 2 >= 10) {
                     toBeMultiplied += (current * 2) % 10 + (current * 2) / 10;
                 }
 
                 else {
-                toBeMultiplied += (current * 2);
+                    toBeMultiplied += (current * 2);
                 }
             }
         }
         if ((toBeAdded+toBeMultiplied) % 10 == 0) {
             return "Card is Legitimate!";
-        } else {
+        } 
+        
+        else {
             return "Card is Illegitimate!";
         }
     }
@@ -947,7 +1075,7 @@ public class Main {
         // 2. currencyDenomination
         // 3. monthlyInstallment
 
-        String[] callers = {"creditCardValidator", "IBANvalidator", "currencyDenomination", "monthlyInstallment"};
+        String[] callers = {"creditCardValidator", "IBANvalidator", "currencyDenomination", "monthlyInstallment", "percentage_and_tax_calc"};
         int callerBoundary = 0;
 
         // The array callers is made in order of their boundary lines in history.txt
@@ -1036,7 +1164,7 @@ public static void displayResult(String cardNumber, String type, String legitima
 }
 
 
-    public static void creditCardValidator(){
+    public static void creditCardValidator() {
         Scanner scan = new Scanner(System.in);
 
         //all input as string
@@ -1045,108 +1173,239 @@ public static void displayResult(String cardNumber, String type, String legitima
         boolean searching = true;
 
         while (true) {
-            System.out.printf("""
-        =======================================================================
-                                Credit Card Validator
-        =======================================================================
+            CardNumber.clear();
+                System.out.printf("""
+            =======================================================================
+                                    Credit Card Validator
+            =======================================================================
 
-        This validates Credit Card numbers with its Card Type, and Luhn's Algorithm.
+            This validates Credit Card numbers with its Card Type, and Luhn's Algorithm.
 
-        Only works with Visa, MasterCard, AMEX, JCB.
-        """);
+            Only works with Visa, MasterCard, AMEX, JCB.
+            """);
 
-        System.out.println();
-        System.out.println("Enter X to show each credit card validity \nEnter Q to go back to the main menu.\n");
+            System.out.println();
+            System.out.println("Enter X to show each credit card validity \nEnter Q to go back to the main menu.\n");
 
+            while (true) {
+
+                System.out.print("Enter Card Number to Verify: ");
+
+                input = scan.nextLine();
+
+                if (input.isEmpty() == true) {
+                    System.out.println("Try Again: \n");
+                } 
+                
+                else if (input.toLowerCase().equals("q")) {
+                    break;
+                } 
+                
+                else if ((input.toLowerCase().equals("x")) == true) {
+                    break;
+                } 
+                
+                else if ((input.matches("[0-9]+")) == false) {
+                    System.out.println("Numbers only!");
+                }
+
+                CardNumber.add(input);
+            }
+            
+            String summary = "";
+
+            if ((input.toLowerCase().equals("x")) == true) {
+                System.out.println("\n");
+
+                summary += "=======================================================================\n";
+
+                summary += String.format("%-25s | %-10s | %-25s%n",
+                    "Card Number", "Type", "Legitimacy");
+
+                summary += "-----------------------------------------------------------------------\n";
+            
+            for (int x = 0; x < CardNumber.size(); x++) {
+                if ((CardNumber.get(x)) == null || ((CardNumber.get(x)).matches("[0-9]+")) == false) {
+                    continue;
+                }
+
+                String CardType = Credit_Type(CardNumber.get(x));
+                
+                summary += String.format("%-25s | %-10s | %-25s%n",
+                            CardNumber.get(x), CardType, LuhnAlgorithm(CardNumber.get(x)));
+            }
+
+            summary += "=======================================================================";
+
+            System.out.println(summary);
+            writeHistory(summary);
+
+            transitionDelay();
+            
+            System.out.println("\nWould you like to input another amount?");
+
+            searching = true;
+
+            while (searching) {
+
+                System.out.println("Please enter Y to input again or N to return to the main menu.");
+                System.out.print("Option: ");
+
+                input = scanner.nextLine().toLowerCase();
+
+                if (input.equals("y")) {
+                    transitionDelay();
+                    searching = false;
+                }
+
+                else if (input.equals("n")) {
+                    transitionDelay();
+                    searching = false;
+                    mainMenu();
+                    return;
+                }
+
+                else {
+                    System.out.println();
+                }
+            }
+        }
+        
+        if ((input.equals("Q"))==true) {
+            transitionDelay();
+            searching = false;
+            mainMenu();
+            return;
+        }
+        }
+    }
+
+    public static void viewHistory() {
         while (true) {
+            Path historyPath = Paths.get("history.txt");
 
-            System.out.print("Enter Card Number to Verify: ");
+            System.out.println("""
+                =================================
+                        VIEW HISTORY
+                =================================""");
 
-            input = scan.nextLine();
+            System.out.println("Choose the option you would like to see your history of.");
+            System.out.println("""
+    [1] Credit Card Validator
+    [2] International Bank Account Number (IBAN) Validator
+    [3] Currency Denomination Calculator
+    [4] Monthly Installment Calculator
+    [5] Percentage and Tax Calculator
+    [6] Return to Main Menu\n""");
+            
+            boolean searching = true;
+            int option = 0;
 
-            if (input.isEmpty() == true) {
-                System.out.println("Try Again: \n");
-            } 
-            
-            else if (input.toLowerCase().equals("q")) {
-                break;
-            } 
-            
-            else if ((input.toLowerCase().equals("x")) == true) {
-                break;
-            } 
-            
-            else if ((input.matches("[0-9]+")) == false) {
-                System.out.println("Numbers only!");
+            while (searching) {
+                System.out.print("Option: "); 
+                String input = scanner.nextLine();
+
+                try {
+                    option = Integer.parseInt(input);
+
+                    if (option >= 1 && option <= 6) {
+                        searching = false;
+                    }
+
+                    else {
+                        System.out.println("Please enter a valid option, ranging from 1 to 6.");
+                    }
+                }
+
+                catch (NumberFormatException e) {
+                        System.out.println("Please enter a valid option, ranging from 1 to 6.");
+                }
             }
 
-            CardNumber.add(input);
-        }
-        
-        String summary = "";
-
-        if ((input.toLowerCase().equals("x")) == true) {
-            System.out.println("\n");
-
-            summary += "=======================================================================\n";
-
-            summary += String.format("%-25s | %-10s | %-25s%n",
-                "Card Number", "Type", "Legitimacy");
-
-            summary += "-----------------------------------------------------------------------\n";
-        
-        for(int x = 0; x < CardNumber.size(); x++) {
-            if ((CardNumber.get(x)) == null || ((CardNumber.get(x)).matches("[0-9]+")) == false) {
-                continue;
-            }
-
-            String CardType = Credit_Type(CardNumber.get(x));
-            
-            summary += String.format("%-25s | %-10s | %-25s%n",
-                        CardNumber.get(x), CardType, LuhnAlgorithm(CardNumber.get(x)));
-        }
-
-        summary += "=======================================================================";
-
-        System.out.println(summary);
-        writeHistory(summary);
-
-        transitionDelay();
-        
-        System.out.println("\nWould you like to input another amount?");
-
-        searching = true;
-
-        while (searching) {
-
-            System.out.println("Please enter Y to input again or N to return to the main menu.");
-            System.out.print("Option: ");
-
-            input = scanner.nextLine().toLowerCase();
-
-            if (input.equals("y")) {
+            if (option == 6) {
+                System.out.println("Returning to main menu...\n");
                 transitionDelay();
-                searching = false;
-            }
-
-            else if (input.equals("n")) {
-                transitionDelay();
-                searching = false;
                 mainMenu();
                 return;
             }
 
-            else {
+            try {
+                List<String> lines = Files.readAllLines(historyPath);
+
+                int boundaryLines = 0;
+                int sectionBoundaryLines = 0;
+                int sectionBoundaryIndex = 0;
+                int methodBoundaryIndex = 0;
+                
+
+                for (int i = 0; i < lines.size(); i++) {
+                    String curr = lines.get(i);
+
+                    if (curr.equals("----------------------------------------------")) {
+                        boundaryLines++;
+                    }
+
+                    if (boundaryLines == option) {
+                        methodBoundaryIndex = i;
+                        int index = i;
+
+                        while (sectionBoundaryLines != 2) {
+                            curr = lines.get(index);
+
+                            if (curr.equals("==============================================")) {
+                                sectionBoundaryLines++;
+                            }
+
+                            index--;
+                        }
+
+                        sectionBoundaryIndex = index + 1;
+                        break;
+                    }  
+                }
+
+                List<String> history = lines.subList(sectionBoundaryIndex, methodBoundaryIndex);
                 System.out.println();
+                transitionDelay();
+
+                for (String line : history) {
+                    System.out.println(line);
+                }
+
+                System.out.println("Enter Y to go back to the keep viewing your history, and N to go back to the main menu.");
+
+                searching = true;
+
+                while (searching) {
+                    System.out.print("Option: ");
+                    String input = scanner.nextLine();
+
+                    if (input.toLowerCase().equals("y")) {
+                        System.out.println();
+                        searching = false;
+                    }
+
+                    else if (input.toLowerCase().equals("n")) {
+                        transitionDelay();
+                        System.out.println();
+                        searching = false;
+                        mainMenu();
+                        return;
+
+                    }
+
+                    else {
+                        System.out.println("Enter only Y or N.\n");
+                    }
+                }
+                                    
+                
+            }
+
+            catch (IOException e) {
+                System.out.println("An error occurred in viewing your history.");
+                return;
             }
         }
-    }
-    if ((input.equals("Q"))==true) {
-        transitionDelay();
-        searching = false;
-        mainMenu();
-        return;
-    }
-    }
     }
 }
