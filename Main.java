@@ -1,23 +1,35 @@
+// Reading files for history and IBAN directory
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.File;
+
+// Used for money calculations in monthly installment calculator
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
+
 import java.util.ArrayList;
+import java.util.Locale;
 import java.util.List;
 import java.util.Scanner;
 import java.util.Optional;
+
+// Used for the IBAN api used to get information on the bank of origin of an account
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.net.http.HttpRequest.BodyPublishers;
+
+// Writing to history file
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+
+// Parsing json response with regex, so no more .jar
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 
@@ -563,6 +575,7 @@ public class Main {
 
             summary = summary + "IBAN STATUS: ";
 
+            // ibanChecksum % 97 == 1
             if (ibanChecksum.mod(BigInteger.valueOf(97)).compareTo(BigInteger.valueOf(1)) == 0) {
                 summary = summary + "VALID" + "\nCOUNTRY: " + country + "\n\n" + getBank(iban);
             }
@@ -1019,7 +1032,7 @@ public class Main {
         for(int i = 1; i <= max; i++) {
             int current = Character.getNumericValue(CardNumberArray[(number.length())-i]);
             
-            if (i%2 != 0) {
+            if (i % 2 != 0) {
                 toBeAdded += current;
             }
             
@@ -1034,11 +1047,11 @@ public class Main {
             }
         }
         if ((toBeAdded+toBeMultiplied) % 10 == 0) {
-            return "Card is Legitimate!";
+            return "LEGITIMATE";
         } 
         
         else {
-            return "Card is Illegitimate!";
+            return "ILLEGITIMATE";
         }
     }
 
@@ -1047,6 +1060,7 @@ public class Main {
 
         try {
             historyFile.createNewFile();
+            historyFile.setReadOnly();
         }
 
         catch (IOException e) {
@@ -1054,13 +1068,14 @@ public class Main {
             return;
         }
 
-
         Path historyPath = Paths.get("history.txt");
 
-        String sectionBoundary = "----------------------------------------------";
-        LocalDate currentDate = LocalDate.now();
+        String sectionBoundary = "==============================================";
+        LocalDateTime now = LocalDateTime.now();
+        DateTimeFormatter format = DateTimeFormatter.ofPattern("MM-dd-yyyy - HH:mm a", Locale.ENGLISH);
 
-        summary = currentDate + "\n" + summary + "\n";
+        String dateTime = now.format(format);
+        summary = dateTime + "\n" + summary + "\n";
 
         // Find caller of this method
         Optional<StackWalker.StackFrame> callerFrame = StackWalker.getInstance()
@@ -1083,7 +1098,7 @@ public class Main {
 
         for (int i = 0; i < callers.length; i++) {
             if (callers[i].equals(caller)) {
-                callerBoundary = i + 1;
+                callerBoundary = (i + 1) * 2;
             }
         }
 
@@ -1116,10 +1131,21 @@ public class Main {
           MONTHLY INSTALLMENT HISTORY
 ==============================================
 
+----------------------------------------------
+
+==============================================
+          PERCENTAGE AND TAX HISTORY
+==============================================
+
 ----------------------------------------------""";
                 
                 lines.add(initialFormat);
+
+                historyFile.setWritable(true);
+
                 Files.write(historyPath, lines);
+
+                historyFile.setReadOnly();
 
                 lines = Files.readAllLines(historyPath);
             }
@@ -1134,13 +1160,18 @@ public class Main {
                 }
 
                 if (boundaryLines == callerBoundary) {
-                    boundaryIndex = i;
+                    boundaryIndex = i + 2;
                     break;
                 }
             }
 
-            lines.add(boundaryIndex, summary);
+            lines.add(boundaryIndex, summary + "\n");
+
+            historyFile.setWritable(true);
+
             Files.write(historyPath, lines);
+
+            historyFile.setReadOnly();
 
         }
 
@@ -1156,6 +1187,8 @@ public static void displayResult(String cardNumber, String type, String legitima
     System.out.printf("%-25s | %-18s | %-15s%n",
             "Card Number", "Type", "Legitimacy");
     System.out.println("--------------------------------------------------------------------");
+
+    cardNumber = "*".repeat(cardNumber.length() - 4) + cardNumber.substring(cardNumber.length() - 4, cardNumber.length());
 
     System.out.printf("%-25s | %-18s | %-15s%n",
             cardNumber, type, legitimacy);
@@ -1198,11 +1231,19 @@ public static void displayResult(String cardNumber, String type, String legitima
                 } 
                 
                 else if (input.toLowerCase().equals("q")) {
-                    break;
+                    mainMenu();
+                    return;
                 } 
                 
                 else if ((input.toLowerCase().equals("x")) == true) {
-                    break;
+                    if (!CardNumber.isEmpty()) {
+                        break;
+                    }
+
+                    else {
+                        System.out.println("Please input a credit card before showing each credit card validity by entering X.\n");
+                        continue;
+                    }
                 } 
                 
                 else if ((input.matches("[0-9]+")) == false) {
@@ -1219,7 +1260,7 @@ public static void displayResult(String cardNumber, String type, String legitima
 
                 summary += "=======================================================================\n";
 
-                summary += String.format("%-25s | %-10s | %-25s%n",
+                summary += String.format("%-30s | %-10s | %-25s%n",
                     "Card Number", "Type", "Legitimacy");
 
                 summary += "-----------------------------------------------------------------------\n";
@@ -1230,9 +1271,9 @@ public static void displayResult(String cardNumber, String type, String legitima
                 }
 
                 String CardType = Credit_Type(CardNumber.get(x));
-                
-                summary += String.format("%-25s | %-10s | %-25s%n",
-                            CardNumber.get(x), CardType, LuhnAlgorithm(CardNumber.get(x)));
+                String censoredNumber = "* ".repeat(CardNumber.get(x).length() - 4) + CardNumber.get(x).substring(CardNumber.get(x).length() - 4, CardNumber.get(x).length());
+                summary += String.format("%-30s | %-10s | %-25s%n",
+                            censoredNumber, CardType, LuhnAlgorithm(CardNumber.get(x)));
             }
 
             summary += "=======================================================================";
@@ -1365,6 +1406,7 @@ public static void displayResult(String cardNumber, String type, String legitima
                 }
 
                 List<String> history = lines.subList(sectionBoundaryIndex, methodBoundaryIndex);
+
                 System.out.println();
                 transitionDelay();
 
@@ -1397,13 +1439,13 @@ public static void displayResult(String cardNumber, String type, String legitima
                     else {
                         System.out.println("Enter only Y or N.\n");
                     }
-                }
-                                    
-                
+                } 
             }
 
             catch (IOException e) {
-                System.out.println("An error occurred in viewing your history.");
+                System.out.println("You have no history yet! Use this function from the main menu to obtain viewable history.\n");
+                transitionDelay();
+                mainMenu();
                 return;
             }
         }
